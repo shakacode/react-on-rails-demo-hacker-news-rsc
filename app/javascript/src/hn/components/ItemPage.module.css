@@ -1,0 +1,66 @@
+.item {
+  color: #333;
+  max-width: 840px;
+}
+
+.title {
+  font-size: 22px;
+  margin: 0 0 10px;
+}
+
+.title a {
+  color: #000;
+  text-decoration: none;
+}
+
+.title a:hover {
+  text-decoration: underline;
+}
+
+.meta {
+  color: var(--hn-muted);
+  font-size: 12px;
+  margin: 0 0 8px;
+}
+
+.storyText {
+  color: #000;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: 16px;
+}
+
+.storyText :global(a) {
+  color: inherit;
+}
+
+.storyText :global(p) {
+  margin: 0 0 10px;
+}
+
+.comment {
+  border-left: 2px solid #e0e0da;
+  color: #444;
+  margin-top: 16px;
+  padding-left: 12px;
+}
+
+.comment :global(p) {
+  margin: 0 0 8px;
+}
+
+.commentsSection {
+  margin-top: 24px;
+}
+
+.commentsHeading {
+  border-bottom: 1px solid #deded5;
+  font-size: 15px;
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+}
+
+.commentsFallback {
+  display: grid;
+  gap: 12px;
+}

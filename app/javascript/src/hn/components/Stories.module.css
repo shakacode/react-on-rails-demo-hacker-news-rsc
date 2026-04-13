@@ -1,0 +1,29 @@
+.wrapper {
+  color: var(--hn-muted);
+}
+
+.list {
+  display: grid;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.rank {
+  color: #888;
+  flex-shrink: 0;
+  font-size: 12px;
+  padding-top: 2px;
+  text-align: right;
+  width: 28px;
+}
+
+.missing {
+  color: #999;
+  font-size: 12px;
+  margin: 0;
+  padding: 2px 0 0;
+}

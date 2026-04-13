@@ -1,0 +1,44 @@
+{
+  "packageManager": "pnpm@10.22.0",
+  "name": "react-on-rails-hacker-news-app",
+  "private": true,
+  "version": "0.1.0",
+  "browserslist": [
+    "defaults"
+  ],
+  "dependencies": {
+    "@rspack/core": "1.7.6",
+    "compression-webpack-plugin": "^11.1.0",
+    "css-loader": "7.1.4",
+    "css-minimizer-webpack-plugin": "7.0.4",
+    "mini-css-extract-plugin": "2.10.0",
+    "prop-types": "15.8.1",
+    "react": "19.0.4",
+    "react-dom": "19.0.4",
+    "react-on-rails-pro": "16.4.0-rc.5",
+    "react-on-rails-pro-node-renderer": "16.4.0-rc.5",
+    "react-on-rails-rsc": "19.0.4",
+    "rspack-manifest-plugin": "5.2.1",
+    "sass-loader": "^16.0.7",
+    "shakapacker": "9.5.0",
+    "style-loader": "4.0.0",
+    "terser-webpack-plugin": "^5.3.16",
+    "webpack": "^5.105.2",
+    "webpack-assets-manifest": "^6.5.0",
+    "webpack-cli": "^6.0.1",
+    "webpack-merge": "^6.0.1",
+    "webpack-subresource-integrity": "^5.1.0"
+  },
+  "devDependencies": {
+    "@rspack/cli": "1.7.6",
+    "@rspack/plugin-react-refresh": "1.6.1",
+    "@swc/core": "1.15.11",
+    "@types/node": "^25.6.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "react-refresh": "0.18.0",
+    "swc-loader": "0.2.7",
+    "typescript": "5.9.3",
+    "webpack-dev-server": "^5.2.3"
+  }
+}

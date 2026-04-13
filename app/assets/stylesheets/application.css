@@ -1,0 +1,27 @@
+:root {
+  --hn-bg: #f6f6ef;
+  --hn-text: #333;
+  --hn-muted: #757575;
+  --hn-accent: #ff6600;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #e6e6df;
+  color: var(--hn-text);
+  font-family: Verdana, Geneva, sans-serif;
+  line-height: 1.4;
+}
+
+a {
+  color: inherit;
+}

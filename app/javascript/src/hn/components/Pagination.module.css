@@ -1,0 +1,32 @@
+.nav {
+  align-items: center;
+  display: flex;
+  font-size: 12px;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-left: 36px;
+}
+
+.page {
+  color: var(--hn-muted);
+}
+
+.link {
+  color: #000;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.disabled {
+  color: #aaa;
+}
+
+@media (max-width: 750px) {
+  .nav {
+    gap: 8px;
+    padding-left: 0;
+  }
+}

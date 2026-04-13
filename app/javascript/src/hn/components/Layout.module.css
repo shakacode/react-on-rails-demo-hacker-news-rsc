@@ -1,0 +1,21 @@
+.main {
+  margin: 0 auto;
+  max-width: 980px;
+  padding-top: 10px;
+}
+
+.page {
+  background: var(--hn-bg);
+  min-height: 70vh;
+  padding: 10px;
+}
+
+@media (max-width: 750px) {
+  .main {
+    padding-top: 0;
+  }
+
+  .page {
+    padding: 8px;
+  }
+}

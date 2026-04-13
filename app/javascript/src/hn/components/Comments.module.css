@@ -1,0 +1,10 @@
+.comments {
+  display: grid;
+  gap: 12px;
+}
+
+.empty {
+  color: var(--hn-muted);
+  font-size: 13px;
+  margin: 0;
+}

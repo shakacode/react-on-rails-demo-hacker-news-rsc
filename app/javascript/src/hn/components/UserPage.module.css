@@ -1,0 +1,41 @@
+.user {
+  color: #333;
+  max-width: 680px;
+}
+
+.title {
+  font-size: 22px;
+  margin: 0 0 14px;
+}
+
+.meta {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.meta div {
+  align-items: baseline;
+  display: flex;
+  gap: 8px;
+}
+
+.meta dt {
+  color: var(--hn-muted);
+  font-size: 12px;
+  min-width: 90px;
+}
+
+.meta dd {
+  margin: 0;
+}
+
+.about {
+  border-top: 1px solid #dfdfd6;
+  margin-top: 14px;
+  padding-top: 12px;
+}
+
+.aboutEmpty {
+  color: var(--hn-muted);
+}

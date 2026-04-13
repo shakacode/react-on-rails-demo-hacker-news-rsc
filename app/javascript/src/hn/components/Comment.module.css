@@ -1,0 +1,104 @@
+.comment {
+  border-left: 2px solid #e0e0da;
+  padding-left: 12px;
+}
+
+.root {
+  border-left: 0;
+  padding-left: 0;
+}
+
+.meta {
+  align-items: center;
+  color: var(--hn-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 12px;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.author,
+.replyCount {
+  color: inherit;
+  text-decoration: none;
+}
+
+.author:hover {
+  text-decoration: underline;
+}
+
+.deletedUser,
+.deletedText {
+  color: #9a9a9a;
+  font-style: italic;
+}
+
+.toggle {
+  background: transparent;
+  border: 0;
+  color: var(--hn-muted);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.toggle::-webkit-details-marker {
+  display: none;
+}
+
+.toggle::marker {
+  content: "";
+}
+
+.toggleDetails {
+  margin: 0;
+}
+
+.toggleDetails:not([open]) .expandedLabel {
+  display: none;
+}
+
+.toggleDetails[open] .collapsedLabel {
+  display: none;
+}
+
+.toggleContent {
+  margin-top: 8px;
+}
+
+.text {
+  color: #000;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.text :global(a) {
+  color: inherit;
+}
+
+.text :global(p) {
+  margin: 0 0 10px;
+}
+
+.text :global(pre) {
+  background: #f2f2ec;
+  border-radius: 4px;
+  margin: 0 0 10px;
+  overflow-x: auto;
+  padding: 8px;
+  white-space: pre-wrap;
+}
+
+.children {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.expandedLabel,
+.collapsedLabel {
+  display: inline;
+}

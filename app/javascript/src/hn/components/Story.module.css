@@ -1,0 +1,72 @@
+.story {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.rank {
+  color: #888;
+  flex-shrink: 0;
+  font-size: 12px;
+  padding-top: 2px;
+  text-align: right;
+  width: 28px;
+}
+
+.content {
+  min-width: 0;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 400;
+  margin: 0;
+}
+
+.title a {
+  color: #000;
+  text-decoration: none;
+}
+
+.title a:visited {
+  color: var(--hn-muted);
+}
+
+.domain {
+  font-size: 11px;
+}
+
+.domain a {
+  color: var(--hn-muted);
+}
+
+.meta {
+  color: var(--hn-muted);
+  font-size: 11px;
+  margin: 2px 0 0;
+}
+
+.meta a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.meta a:hover,
+.title a:hover,
+.domain a:hover {
+  text-decoration: underline;
+}
+
+.vote {
+  background: transparent;
+  border: 0;
+  color: #c4c4c4;
+  cursor: pointer;
+  font-size: 10px;
+  margin-right: 4px;
+  padding: 0;
+}
+
+.voteActive {
+  color: var(--hn-accent);
+}
