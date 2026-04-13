@@ -199,6 +199,8 @@ That means the app can use Rails cache headers, ETags, and 404 responses without
 
 ## Comparison with the Next.js Version
 
+For a detailed compare-and-contrast, including local benchmark notes and “when to choose which” guidance, see [docs/react-on-rails-pro-vs-nextjs.md](docs/react-on-rails-pro-vs-nextjs.md).
+
 | Concern | Next.js Reference | This App |
 | --- | --- | --- |
 | Routing | App Router / file-system routes | Rails routes + Rails controllers |
