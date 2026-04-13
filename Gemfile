@@ -63,4 +63,4 @@ end
 gem "react_on_rails", "= 16.4.0.rc.5"
 gem "react_on_rails_pro", "= 16.4.0.rc.5"
 
-gem "shakapacker", "= 9.5"
+gem "shakapacker", "10.0.0"
