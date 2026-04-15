@@ -57,7 +57,19 @@ const configureServer = (rscBundle = false) => {
   // Skip for RSC bundle - it doesn't need RSCWebpackPlugin.
   // RSCWebpackPlugin currently relies on Webpack internals not available in Rspack.
   if (!rscBundle && config.assets_bundler !== 'rspack') {
-    serverWebpackConfig.plugins.push(new RSCWebpackPlugin({ isServer: true }));
+    serverWebpackConfig.plugins.push(
+      new RSCWebpackPlugin({
+        isServer: true,
+        // Keep the RSC manifest scan inside application code so vendored gems
+        // installed under the repo (for example, vendor/bundle in CI) do not
+        // contribute stray client components.
+        clientReferences: [{
+          directory: './app/javascript',
+          recursive: true,
+          include: /\.(js|ts|jsx|tsx)$/,
+        }],
+      }),
+    );
   }
   serverWebpackConfig.plugins.unshift(new bundler.optimize.LimitChunkCountPlugin({ maxChunks: 1 }));
 
