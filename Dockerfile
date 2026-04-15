@@ -9,10 +9,17 @@
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.4.3
+ARG NODE_VERSION=24.8.0
+FROM docker.io/library/node:$NODE_VERSION-slim AS node
+
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
 WORKDIR /rails
+
+# Copy the Node.js runtime used for Shakapacker builds and the production
+# renderer process.
+COPY --from=node /usr/local/ /usr/local/
 
 # Install base packages
 RUN apt-get update -qq && \
@@ -38,11 +45,14 @@ RUN apt-get update -qq && \
 # Install application gems
 COPY vendor/* ./vendor/
 COPY Gemfile Gemfile.lock ./
+COPY package.json pnpm-lock.yaml ./
 
 RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
     bundle exec bootsnap precompile -j 1 --gemfile
+
+RUN npm install --global pnpm@10.22.0 && pnpm install --frozen-lockfile
 
 # Copy application code
 COPY . .

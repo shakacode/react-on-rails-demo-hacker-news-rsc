@@ -14,6 +14,7 @@ Reference projects:
 
 - [Epic: Hacker News RSC Demo for React on Rails Pro](https://github.com/shakacode/react_on_rails-demos/issues/70)
 - [Vercel next-react-server-components](https://github.com/vercel/next-react-server-components)
+- [Control Plane Deployment Notes](.controlplane/readme.md)
 
 ## Live Demo
 
@@ -221,6 +222,17 @@ The test suite uses a deterministic fake Hacker News API plus a dedicated Node r
 - `test/system/hacker_news_app_test.rb` verifies feed rendering, nested comments, comment collapsing, and user pages
 - `test/support/fake_hacker_news_api.rb` removes the external Hacker News API dependency during tests
 - `test/support/node_renderer_test_server.rb` boots the renderer against compiled test assets
+
+## Deployment
+
+This repo now includes Control Plane deployment scaffolding:
+
+- `.controlplane/` contains the GVC and workload templates for review apps, staging, and production
+- `.controlplane/templates/renderer.yml` runs the internal React on Rails Pro Node renderer workload on port `3800`
+- `.controlplane/release_script.sh` runs `bin/rails db:prepare` before image cutover
+- `.github/workflows/cpflow-*.yml` adds review apps, auto-deploys `main` to staging, manual promotion to production, and stale review-app cleanup
+
+See [Control Plane Deployment Notes](.controlplane/readme.md) for the required GitHub secrets and variables plus the external Postgres configuration expected by this demo.
 
 ## Learn More
 

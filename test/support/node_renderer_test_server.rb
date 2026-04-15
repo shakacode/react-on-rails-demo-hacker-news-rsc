@@ -7,12 +7,12 @@ require "timeout"
 module NodeRendererTestServer
   extend self
 
-  PORT = 3800
+  DEFAULT_PORT = 3800
 
   def start!
     return if running?
 
-    @port = PORT
+    @port = available_port
     log_file = Rails.root.join("tmp/node-renderer-test.log")
     FileUtils.mkdir_p(log_file.dirname)
 
@@ -35,6 +35,7 @@ module NodeRendererTestServer
 
     ReactOnRailsPro.configuration.renderer_password = "devPassword"
     ReactOnRailsPro.configuration.renderer_url = "http://127.0.0.1:#{@port}"
+    ReactOnRailsPro::Request.reset_connection
   end
 
   def stop!
@@ -58,6 +59,16 @@ module NodeRendererTestServer
     true
   rescue Errno::ESRCH
     false
+  end
+
+  def available_port
+    TCPServer.open("127.0.0.1", DEFAULT_PORT) do |server|
+      return server.addr[1]
+    end
+  rescue Errno::EADDRINUSE
+    TCPServer.open("127.0.0.1", 0) do |server|
+      return server.addr[1]
+    end
   end
 
   def wait_until_ready
