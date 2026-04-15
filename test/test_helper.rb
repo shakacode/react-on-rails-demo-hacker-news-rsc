@@ -10,6 +10,12 @@ require_relative "support/node_renderer_test_server"
 FakeHackerNewsAPI.start!
 ENV["HN_API_BASE_URL"] = FakeHackerNewsAPI.base_url
 FileUtils.rm_rf(Rails.root.join(".node-renderer-bundles"))
+generated_server_bundle_path = Rails.root.join("app/javascript/generated/server-bundle-generated.js")
+
+unless generated_server_bundle_path.exist?
+  raise "Failed to generate test packs" unless system({ "RAILS_ENV" => "test" }, "bin/shakapacker-precompile-hook")
+end
+
 raise "Failed to compile test assets" unless system({ "RAILS_ENV" => "test" }, "bin/shakapacker")
 NodeRendererTestServer.start!
 
