@@ -14,6 +14,15 @@ Reference projects:
 
 - [Epic: Hacker News RSC Demo for React on Rails Pro](https://github.com/shakacode/react_on_rails-demos/issues/70)
 - [Vercel next-react-server-components](https://github.com/vercel/next-react-server-components)
+- [Legacy implementation workspace](https://github.com/shakacode/react-on-rails-hn-rsc-demo)
+
+## Repository Status
+
+This repository is the canonical public Hacker News RSC demo for React on Rails Pro.
+
+It supersedes the older [`shakacode/react-on-rails-hn-rsc-demo`](https://github.com/shakacode/react-on-rails-hn-rsc-demo) repo, which is still useful as historical implementation context but is no longer the best public entry point.
+
+For the repo comparison and recommended archive handoff, see [docs/repo-status-and-archive-plan.md](docs/repo-status-and-archive-plan.md).
 
 ## Live Demo
 
