@@ -76,6 +76,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.22.0
+          run_install: false
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -83,9 +89,7 @@ jobs:
           cache: pnpm
 
       - name: Install JavaScript dependencies
-        run: |
-          corepack enable
-          pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -126,6 +130,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.22.0
+          run_install: false
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -133,9 +143,7 @@ jobs:
           cache: pnpm
 
       - name: Install JavaScript dependencies
-        run: |
-          corepack enable
-          pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
