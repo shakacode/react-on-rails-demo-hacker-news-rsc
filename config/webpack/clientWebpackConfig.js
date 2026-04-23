@@ -4,6 +4,7 @@
 const commonWebpackConfig = require('./commonWebpackConfig');
 const { config } = require('shakapacker');
 const { RSCWebpackPlugin } = require('react-on-rails-rsc/WebpackPlugin');
+const rscClientReferences = require('./rscClientReferences');
 
 const configureClient = () => {
   const clientConfig = commonWebpackConfig();
@@ -16,7 +17,9 @@ const configureClient = () => {
 
   // RSCWebpackPlugin currently relies on Webpack internals that are not yet available in Rspack.
   if (config.assets_bundler !== 'rspack') {
-    clientConfig.plugins.push(new RSCWebpackPlugin({ isServer: false }));
+    clientConfig.plugins.push(
+      new RSCWebpackPlugin({ isServer: false, clientReferences: rscClientReferences }),
+    );
   }
 
   return clientConfig;

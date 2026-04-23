@@ -8,6 +8,7 @@ const bundler = config.assets_bundler === 'rspack'
   ? require('@rspack/core')
   : require('webpack');
 const { RSCWebpackPlugin } = require('react-on-rails-rsc/WebpackPlugin');
+const rscClientReferences = require('./rscClientReferences');
 
 function extractLoader(rule, loaderName) {
   if (!Array.isArray(rule.use)) return null;
@@ -57,7 +58,9 @@ const configureServer = (rscBundle = false) => {
   // Skip for RSC bundle - it doesn't need RSCWebpackPlugin.
   // RSCWebpackPlugin currently relies on Webpack internals not available in Rspack.
   if (!rscBundle && config.assets_bundler !== 'rspack') {
-    serverWebpackConfig.plugins.push(new RSCWebpackPlugin({ isServer: true }));
+    serverWebpackConfig.plugins.push(
+      new RSCWebpackPlugin({ isServer: true, clientReferences: rscClientReferences }),
+    );
   }
   serverWebpackConfig.plugins.unshift(new bundler.optimize.LimitChunkCountPlugin({ maxChunks: 1 }));
 
