@@ -153,6 +153,16 @@ That is not a blocker, but it is a notable product limitation if the broader eco
 
 These are the best candidate upstream issues based on this implementation.
 
+Tracking links:
+
+- [`#3201`: RSCWebpackPlugin defaults to scanning project root and can bundle vendor gem templates](https://github.com/shakacode/react_on_rails/issues/3201)
+- [`#3182`: RSC stream failures should surface component path and original exception in dev](https://github.com/shakacode/react_on_rails/issues/3182)
+- [`#3184`: Detect unsupported client-hook usage in RSC/server bundle earlier and fail with actionable diagnostics](https://github.com/shakacode/react_on_rails/issues/3184)
+- [`#3183`: Document Node renderer runtime globals for RSC, including fetch support expectations](https://github.com/shakacode/react_on_rails/issues/3183)
+- [`#3181`: Add official guide or helper for integration/system testing with RSC and the Node renderer](https://github.com/shakacode/react_on_rails/issues/3181)
+- [`#3180`: Document recommended patterns for 404, redirects, and cache headers when Rails owns the request and RSC owns rendering](https://github.com/shakacode/react_on_rails/issues/3180)
+- [`#3141`: Revise Rspack support and plan RSC + Rspack compatibility](https://github.com/shakacode/react_on_rails/issues/3141)
+
 ## 1. Improve dev-mode error reporting for RSC stream failures
 
 Suggested title:
