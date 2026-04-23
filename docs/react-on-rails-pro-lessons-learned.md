@@ -23,7 +23,7 @@ None of them were deal-breakers, but several of them are strong candidates for u
 
 ## Issues We Actually Hit
 
-## 1. Client component boundaries were easy to misconfigure
+### 1. Client component boundaries were easy to misconfigure
 
 The most important runtime issue in the implementation was this:
 
@@ -52,7 +52,7 @@ This is exactly the class of bug people will hit when first adopting RSC:
 
 That means it is product-surface friction, not just app-specific friction.
 
-## 2. The Node renderer VM does not behave like a normal Node app
+### 2. The Node renderer VM does not behave like a normal Node app
 
 The `hnApi.ts` implementation initially used `fetch`.
 
@@ -68,7 +68,7 @@ If it can be exposed safely, the default developer experience would improve.
 
 This was one of the most surprising runtime differences versus Next.js.
 
-## 3. RSC test setup was more manual than it should be
+### 3. RSC test setup was more manual than it should be
 
 To get integration and system tests stable, the demo had to do a fair amount of custom wiring:
 
@@ -85,7 +85,7 @@ This works, but it is more infrastructure than most teams will expect for testin
 
 If React on Rails Pro wants RSC adoption to feel routine inside Rails apps, test setup is one of the highest leverage places to smooth out.
 
-## 4. Streamed RSC errors were not observable enough
+### 4. Streamed RSC errors were not observable enough
 
 During the item-page failure, the diagnostic path was weaker than it should have been:
 
@@ -105,7 +105,7 @@ A product should make the common failure mode legible:
 - whether it failed in the server bundle or the RSC bundle
 - whether the root cause was an unsupported hook/client import/runtime global
 
-## 5. Route-level 404 handling is a real integration concern
+### 5. Route-level 404 handling is a real integration concern
 
 In Next.js, route-level missing-item handling can live naturally inside the route tree.
 
@@ -126,7 +126,7 @@ Teams adopting React on Rails Pro for RSC will run into this immediately:
 - Where should redirects live?
 - Can a server component trigger HTTP semantics upstream?
 
-## 6. Rspack is not yet a clean option for this RSC path
+### 6. Rspack is not yet a clean option for this RSC path
 
 This demo stayed on Webpack because the current RSC manifest/plugin flow depends on it.
 
@@ -163,7 +163,7 @@ Tracking links:
 - [`#3180`: Document recommended patterns for 404, redirects, and cache headers when Rails owns the request and RSC owns rendering](https://github.com/shakacode/react_on_rails/issues/3180)
 - [`#3141`: Revise Rspack support and plan RSC + Rspack compatibility](https://github.com/shakacode/react_on_rails/issues/3141)
 
-## 1. Improve dev-mode error reporting for RSC stream failures
+### 1. Improve dev-mode error reporting for RSC stream failures
 
 Suggested title:
 
@@ -176,7 +176,7 @@ What it should ask for:
 - explicit distinction between server-bundle and RSC-bundle failures
 - original stack trace preservation where possible
 
-## 2. Catch client-component boundary mistakes earlier
+### 2. Catch client-component boundary mistakes earlier
 
 Suggested title:
 
@@ -188,7 +188,7 @@ What it should ask for:
 - explicit messaging when a `useState`/`useEffect` component lands in the wrong runtime
 - guidance on supported client-boundary patterns in React on Rails Pro
 
-## 3. Clarify or support `fetch` inside the Node renderer runtime
+### 3. Clarify or support `fetch` inside the Node renderer runtime
 
 Suggested title:
 
@@ -200,7 +200,7 @@ Possible scope:
 - or expose `fetch`, `Headers`, `Request`, and `Response` if safe
 - or document the recommended escape hatch through `additionalContext`
 
-## 4. Provide first-class RSC testing guidance for Rails apps
+### 4. Provide first-class RSC testing guidance for Rails apps
 
 Suggested title:
 
@@ -214,7 +214,7 @@ What it should cover:
 - parallelization caveats
 - examples for Capybara/system tests
 
-## 5. Document Rails-owned HTTP semantics with RSC
+### 5. Document Rails-owned HTTP semantics with RSC
 
 Suggested title:
 
@@ -222,7 +222,7 @@ Suggested title:
 
 This is especially important because it is one of the main reasons teams choose React on Rails Pro over Next.js.
 
-## 6. Track Rspack compatibility for RSC manifests/plugins
+### 6. Track Rspack compatibility for RSC manifests/plugins
 
 Suggested title:
 
@@ -234,7 +234,7 @@ If parity is not near-term, the docs should say that plainly.
 
 These documentation updates would have reduced implementation time materially.
 
-## 1. Add a “Common RSC Failure Modes” page
+### 1. Add a “Common RSC Failure Modes” page
 
 Include:
 
@@ -244,7 +244,7 @@ Include:
 - missing client manifest / stale renderer cache
 - “what to inspect first” checklist
 
-## 2. Add a “Rails Route Ownership with RSC” guide
+### 2. Add a “Rails Route Ownership with RSC” guide
 
 Cover:
 
@@ -256,7 +256,7 @@ Cover:
 - 404 behavior
 - HTTP caching patterns
 
-## 3. Add a dedicated testing guide for RSC
+### 3. Add a dedicated testing guide for RSC
 
 Cover:
 
@@ -267,7 +267,7 @@ Cover:
 - bundle cache invalidation
 - when parallel tests are unsafe
 
-## 4. Make Node renderer runtime constraints explicit
+### 4. Make Node renderer runtime constraints explicit
 
 A page should answer:
 
@@ -277,7 +277,7 @@ A page should answer:
 - how `supportModules` changes behavior
 - how to add safe globals
 
-## 5. Add a small end-to-end demo showing server components plus one client island
+### 5. Add a small end-to-end demo showing server components plus one client island
 
 The best doc example would look a lot like this app:
 
@@ -290,7 +290,7 @@ The best doc example would look a lot like this app:
 
 That example would answer more real adoption questions than a minimal hello-world.
 
-## 6. Explain streaming semantics more explicitly
+### 6. Explain streaming semantics more explicitly
 
 The docs should make clear that:
 

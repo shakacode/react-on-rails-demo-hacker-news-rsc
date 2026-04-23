@@ -62,4 +62,4 @@ Before archiving the older repo:
 
 ## Current Blocker
 
-The only blocker to the final archive step is that archiving a repository is an irreversible action and should be an explicit maintainership decision.
+The only blocker to the final archive step is that archiving makes the older repository read-only and should be an explicit maintainership decision. If future changes are needed, maintainers with the required permissions can unarchive it.

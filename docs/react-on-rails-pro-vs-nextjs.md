@@ -125,7 +125,41 @@ These measurements were taken locally on:
 - Node `24.8.0`
 - Ruby `3.4.3`
 
-The Next.js app was benchmarked against a shared local fake Hacker News API so the measurements were not dominated by public API/network jitter. The Rails app used the same fake API.
+### Measurement Method
+
+Revisions measured:
+
+- React on Rails Pro demo: this branch at commit `fd50e3170571f76fbf8df971d4fad3e8ea3a2f53` for the original comparison numbers, with later docs/CI commits not intended to change app behavior
+- Next.js reference: `vercel/next-react-server-components` at commit `e5cdd85`
+
+Clean build timing used one measured cold build per app after deleting generated artifacts and framework caches:
+
+```sh
+# React on Rails Pro demo
+rm -rf public/packs public/packs-test public/assets ssr-generated .node-renderer-bundles tmp/cache
+NODE_ENV=production RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 /usr/bin/time -p bin/shakapacker
+
+# Next.js reference
+rm -rf .next node_modules/.cache
+/usr/bin/time -p pnpm build
+```
+
+Route timing used one unrecorded warmup request followed by five measured warm requests per route. The requests were measured with:
+
+```sh
+curl -sS -o /dev/null -w '%{time_starttransfer} %{time_total}\n' "$BASE_URL/news/2"
+curl -sS -o /dev/null -w '%{time_starttransfer} %{time_total}\n' "$BASE_URL/item/1031"
+```
+
+Both apps were pointed at the deterministic fake Hacker News API from this repo so the measurements were not dominated by public API/network jitter:
+
+```sh
+ruby -Itest -e 'require "./test/support/fake_hacker_news_api"; FakeHackerNewsAPI.start!; puts FakeHackerNewsAPI.base_url; sleep'
+```
+
+Build caches were reset before clean-build timing. Runtime route measurements intentionally kept each app process running between warm requests; they did not drop OS caches or restart servers between measured requests because the goal was warm route behavior rather than cold machine benchmarking.
+
+The exact commands above are included to make the measurements reproducible, but the numbers should still be treated as directional rather than definitive.
 
 Important caveats:
 
