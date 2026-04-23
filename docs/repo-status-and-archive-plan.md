@@ -6,13 +6,13 @@ This document answers a narrow operational question:
 
 Compared repos:
 
-- Current repo: [`shakacode/react_on_rails-hacker-news-app`](https://github.com/shakacode/react_on_rails-hacker-news-app)
+- Current repo: [`shakacode/react-on-rails-demo-hacker-news-rsc`](https://github.com/shakacode/react-on-rails-demo-hacker-news-rsc)
 - Older repo: [`shakacode/react-on-rails-hn-rsc-demo`](https://github.com/shakacode/react-on-rails-hn-rsc-demo)
 
 ## Recommendation
 
-- Do not archive `react_on_rails-hacker-news-app`
-- Make `react_on_rails-hacker-news-app` the clear canonical demo
+- Do not archive `react-on-rails-demo-hacker-news-rsc`
+- Make `react-on-rails-demo-hacker-news-rsc` the clear canonical demo
 - After a short handoff, archive `react-on-rails-hn-rsc-demo`
 
 ## Why This Repo Should Stay Active

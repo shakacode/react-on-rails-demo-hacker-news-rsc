@@ -18,7 +18,7 @@ Reference projects:
 
 ## Repository Status
 
-This repository is the canonical public Hacker News RSC demo for React on Rails Pro.
+[`shakacode/react-on-rails-demo-hacker-news-rsc`](https://github.com/shakacode/react-on-rails-demo-hacker-news-rsc) is the canonical public Hacker News RSC demo for React on Rails Pro.
 
 It supersedes the older [`shakacode/react-on-rails-hn-rsc-demo`](https://github.com/shakacode/react-on-rails-hn-rsc-demo) repo, which is still useful as historical implementation context but is no longer the best public entry point.
 
