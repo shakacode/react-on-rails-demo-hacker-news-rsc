@@ -2,6 +2,7 @@
 // https://github.com/shakacode/react_on_rails_demo_ssr_hmr/blob/master/config/webpack/serverWebpackConfig.js
 
 const { merge, config } = require('shakapacker');
+const path = require('path');
 const commonWebpackConfig = require('./commonWebpackConfig');
 
 const bundler = config.assets_bundler === 'rspack'
@@ -57,7 +58,14 @@ const configureServer = (rscBundle = false) => {
   // Skip for RSC bundle - it doesn't need RSCWebpackPlugin.
   // RSCWebpackPlugin currently relies on Webpack internals not available in Rspack.
   if (!rscBundle && config.assets_bundler !== 'rspack') {
-    serverWebpackConfig.plugins.push(new RSCWebpackPlugin({ isServer: true }));
+    serverWebpackConfig.plugins.push(new RSCWebpackPlugin({
+      isServer: true,
+      clientReferences: {
+        directory: path.resolve(__dirname, '../../app/javascript'),
+        recursive: true,
+        include: /\.(js|ts|jsx|tsx)$/,
+      },
+    }));
   }
   serverWebpackConfig.plugins.unshift(new bundler.optimize.LimitChunkCountPlugin({ maxChunks: 1 }));
 
@@ -65,7 +73,6 @@ const configureServer = (rscBundle = false) => {
   // Using Shakapacker 9.0+ privateOutputPath for automatic sync with shakapacker.yml
   // This eliminates manual path configuration and keeps configs in sync.
   // Falls back to hardcoded path if private_output_path is not configured.
-  const path = require('path');
   const privateOutputPath = config.privateOutputPath || config.private_output_path;
   const resolvedPrivateOutputPath = privateOutputPath
     ? (path.isAbsolute(privateOutputPath)
