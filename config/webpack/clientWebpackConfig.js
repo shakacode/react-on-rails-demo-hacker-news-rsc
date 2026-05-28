@@ -2,6 +2,7 @@
 // https://github.com/shakacode/react_on_rails_demo_ssr_hmr/blob/master/config/webpack/clientWebpackConfig.js
 
 const commonWebpackConfig = require('./commonWebpackConfig');
+const path = require('path');
 const { config } = require('shakapacker');
 const { RSCWebpackPlugin } = require('react-on-rails-rsc/WebpackPlugin');
 
@@ -16,7 +17,14 @@ const configureClient = () => {
 
   // RSCWebpackPlugin currently relies on Webpack internals that are not yet available in Rspack.
   if (config.assets_bundler !== 'rspack') {
-    clientConfig.plugins.push(new RSCWebpackPlugin({ isServer: false }));
+    clientConfig.plugins.push(new RSCWebpackPlugin({
+      isServer: false,
+      clientReferences: {
+        directory: path.resolve(__dirname, '../../app/javascript'),
+        recursive: true,
+        include: /\.(js|ts|jsx|tsx)$/,
+      },
+    }));
   }
 
   return clientConfig;
