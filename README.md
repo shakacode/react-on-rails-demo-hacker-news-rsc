@@ -15,6 +15,10 @@ Reference projects:
 - [Epic: Hacker News RSC Demo for React on Rails Pro](https://github.com/shakacode/react_on_rails-demos/issues/70)
 - [Vercel next-react-server-components](https://github.com/vercel/next-react-server-components)
 
+Related:
+
+- [react-on-rails-starter-tanstack](https://github.com/shakacode/react-on-rails-starter-tanstack) - the 2026 TanStack-first starter that shares the Rails + React on Rails Pro patterns behind this public-traffic RSC demo.
+
 ## Live Demo
 
 - Public deployment: not configured yet
