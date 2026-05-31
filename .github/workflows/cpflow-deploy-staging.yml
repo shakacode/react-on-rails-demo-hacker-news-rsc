@@ -56,6 +56,7 @@ jobs:
 
           missing=()
           [[ -n "${{ secrets.CPLN_TOKEN_STAGING }}" ]] || missing+=("secret:CPLN_TOKEN_STAGING")
+          [[ -n "${{ secrets.SHARED_POSTGRES_URL_PREFIX }}" ]] || missing+=("secret:SHARED_POSTGRES_URL_PREFIX")
           [[ -n "${{ vars.CPLN_ORG_STAGING }}" ]] || missing+=("variable:CPLN_ORG_STAGING")
           [[ -n "${{ vars.STAGING_APP_NAME }}" ]] || missing+=("variable:STAGING_APP_NAME")
 
@@ -103,6 +104,18 @@ jobs:
         with:
           token: ${{ secrets.CPLN_TOKEN_STAGING }}
           org: ${{ vars.CPLN_ORG_STAGING }}
+
+      - name: Ensure shared Postgres identity and database secret
+        env:
+          SHARED_POSTGRES_URL_PREFIX: ${{ secrets.SHARED_POSTGRES_URL_PREFIX }}
+        shell: bash
+        run: script/control-plane/ensure-shared-postgres-secret
+
+      - name: Apply shared Postgres app template
+        shell: bash
+        run: |
+          set -euo pipefail
+          cpflow apply-template app-shared-postgres -a "${APP_NAME}" --org "${CPLN_ORG}" --yes
 
       - name: Detect release phase support
         id: release-phase

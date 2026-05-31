@@ -47,6 +47,7 @@ jobs:
               "",
               "- `CPLN_TOKEN_STAGING`",
               "- `CPLN_TOKEN_PRODUCTION`",
+              "- `SHARED_POSTGRES_URL_PREFIX`",
               "- `DOCKER_BUILD_SSH_KEY` (optional, when Docker builds fetch private dependencies over SSH)",
               "",
               "## Repository variables",

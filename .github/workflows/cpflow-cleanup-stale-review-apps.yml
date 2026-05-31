@@ -45,3 +45,10 @@ jobs:
         run: |
           set -euo pipefail
           cpflow cleanup-stale-apps -a "${{ vars.REVIEW_APP_PREFIX }}" --org "${{ vars.CPLN_ORG_STAGING }}" --yes
+
+      - name: Remove orphan shared Postgres database secrets
+        env:
+          CPLN_ORG: ${{ vars.CPLN_ORG_STAGING }}
+          REVIEW_APP_PREFIX: ${{ vars.REVIEW_APP_PREFIX }}
+        shell: bash
+        run: script/control-plane/cleanup-orphan-shared-postgres-secrets

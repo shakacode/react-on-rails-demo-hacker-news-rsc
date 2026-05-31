@@ -136,9 +136,9 @@ jobs:
           current_image="${selected_image:-${first_image}}"
           current_version="${selected_version:-${first_version}}"
 
-          echo "current_image=${current_image}" >> "$GITHUB_OUTPUT"
-          echo "current_version=${current_version}" >> "$GITHUB_OUTPUT"
           {
+            echo "current_image=${current_image}"
+            echo "current_version=${current_version}"
             echo "rollback_state<<EOF"
             echo "${rollback_state}"
             echo "EOF"

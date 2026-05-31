@@ -20,17 +20,19 @@ spec:
       value: /rails/tmp/.node-renderer-bundles
     - name: SOLID_QUEUE_IN_PUMA
       value: "true"
-    # Required runtime secrets:
-    # - name: RAILS_MASTER_KEY
-    #   value: cpln://secret/{{APP_SECRETS}}.RAILS_MASTER_KEY
-    # - name: DATABASE_URL
-    #   value: cpln://secret/{{APP_SECRETS}}.DATABASE_URL
-    # - name: CACHE_DATABASE_URL
-    #   value: cpln://secret/{{APP_SECRETS}}.CACHE_DATABASE_URL
-    # - name: QUEUE_DATABASE_URL
-    #   value: cpln://secret/{{APP_SECRETS}}.QUEUE_DATABASE_URL
-    # - name: CABLE_DATABASE_URL
-    #   value: cpln://secret/{{APP_SECRETS}}.CABLE_DATABASE_URL
+    # The staging/review deploy workflows generate this dictionary secret from
+    # SHARED_POSTGRES_URL_PREFIX, using separate logical databases per app and
+    # per Rails connection.
+    - name: RAILS_MASTER_KEY
+      value: cpln://secret/{{APP_SECRETS}}.RAILS_MASTER_KEY
+    - name: DATABASE_URL
+      value: cpln://secret/{{APP_NAME}}-database.DATABASE_URL
+    - name: CACHE_DATABASE_URL
+      value: cpln://secret/{{APP_NAME}}-database.CACHE_DATABASE_URL
+    - name: QUEUE_DATABASE_URL
+      value: cpln://secret/{{APP_NAME}}-database.QUEUE_DATABASE_URL
+    - name: CABLE_DATABASE_URL
+      value: cpln://secret/{{APP_NAME}}-database.CABLE_DATABASE_URL
     #
     # Optional renderer secret:
     # - name: RENDERER_PASSWORD

@@ -44,21 +44,80 @@ Optional:
 These can be added either as direct GVC env vars or via a Control Plane secret
 store referenced from `templates/app.yml`.
 
-The four database URLs can point to separate production databases or to the
-same Postgres cluster with distinct database names, matching Rails 8's
-`primary`, `cache`, `queue`, and `cable` connections.
+Staging and review apps use `templates/app-shared-postgres.yml`. They read
+`RAILS_MASTER_KEY` from the shared runtime secret
+`react-on-rails-hn-rsc-demo-secrets`, and they read the four database URLs from
+a per-app Control Plane secret named `{{APP_NAME}}-database`. The GitHub
+workflows create/update that database dictionary secret from
+`SHARED_POSTGRES_URL_PREFIX`, grant the app identity access to it, and also
+grant the app identity access to the shared runtime secret.
+
+Populate `react-on-rails-hn-rsc-demo-secrets.RAILS_MASTER_KEY` before enabling
+staging or review deploys. If `RENDERER_PASSWORD` is set in the app template,
+store it in the same secret.
+
+Set `SHARED_POSTGRES_URL_PREFIX` to the shared Postgres URL without a database
+name, for example:
+
+```sh
+postgres://USER:URL_ENCODED_PASSWORD@postgres.staging-shared-postgres.cpln.local:5432
+```
+
+The workflow appends app-specific database names so each staging/review app
+gets four logical databases:
+
+- `${APP_NAME}`
+- `${APP_NAME}_cache`
+- `${APP_NAME}_queue`
+- `${APP_NAME}_cable`
+
+For example, review app `react-on-rails-hn-rsc-demo-review-pr-41` should not
+share any of its four database names with staging or another review app. The
+database role in `SHARED_POSTGRES_URL_PREFIX` must either have permission to
+create these databases during `bin/rails db:prepare`, or the databases must be
+pre-created before the release phase runs.
+
+This low-cost staging/review setup is not a database security boundary between
+review apps. Apps share the same Postgres credentials and are isolated by
+logical database name. Use per-app roles/passwords from a trusted provisioning
+job if review apps need hard database isolation.
+
+Existing staging/review apps are updated by the deploy workflows before the
+new image is built: they ensure the app identity, patch existing workloads to
+use that identity without changing workload images, create the per-app database
+secret and reveal policy, and re-apply only the `app-shared-postgres` GVC
+template. The old image remains in place until
+`cpflow deploy-image --run-release-phase` completes the release phase and cuts
+over to the new image.
+
+Review app deletion removes the per-app Control Plane database secret and
+policy. The logical databases in the shared Postgres cluster are intentionally
+left in place because dropping them is destructive; archive or drop them with a
+separate trusted database-maintenance task when that data is no longer needed.
 
 ## Local cpflow Flow
 
 Typical setup:
 
 ```sh
-export APP_NAME=react-on-rails-hacker-news-app-staging
+export APP_NAME=react-on-rails-hn-rsc-demo-staging
 
 cpflow setup-app -a "$APP_NAME"
 cpflow build-image -a "$APP_NAME"
 cpflow deploy-image -a "$APP_NAME" --run-release-phase
 cpflow open -a "$APP_NAME"
+```
+
+For a one-off local update of an existing staging or review app:
+
+```sh
+export APP_NAME=react-on-rails-hn-rsc-demo-review-pr-41
+export CPLN_ORG=shakacode-open-source-examples-staging
+export SHARED_POSTGRES_URL_PREFIX="postgres://USER:URL_ENCODED_PASSWORD@postgres.staging-shared-postgres.cpln.local:5432"
+
+script/control-plane/ensure-shared-postgres-secret
+cpflow apply-template app-shared-postgres -a "$APP_NAME" --org "$CPLN_ORG" --yes
+cpflow deploy-image -a "$APP_NAME" --org "$CPLN_ORG" --run-release-phase
 ```
 
 ## GitHub Actions Variables And Secrets
@@ -67,11 +126,12 @@ Set these in GitHub before enabling the generated `cpflow-*` workflows:
 
 - `CPLN_TOKEN_STAGING`
 - `CPLN_TOKEN_PRODUCTION`
+- `SHARED_POSTGRES_URL_PREFIX`
 - `CPLN_ORG_STAGING`
 - `CPLN_ORG_PRODUCTION`
-- `STAGING_APP_NAME=react-on-rails-hacker-news-app-staging`
-- `PRODUCTION_APP_NAME=react-on-rails-hacker-news-app-production`
-- `REVIEW_APP_PREFIX=react-on-rails-hacker-news-app-review`
+- `STAGING_APP_NAME=react-on-rails-hn-rsc-demo-staging`
+- `PRODUCTION_APP_NAME=react-on-rails-hn-rsc-demo-production`
+- `REVIEW_APP_PREFIX=react-on-rails-hn-rsc-demo-review-pr`
 
 Optional:
 

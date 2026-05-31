@@ -24,3 +24,4 @@ spec:
         - 0.0.0.0/0
       outboundAllowCIDR:
         - 0.0.0.0/0
+  identityLink: {{APP_IDENTITY_LINK}}

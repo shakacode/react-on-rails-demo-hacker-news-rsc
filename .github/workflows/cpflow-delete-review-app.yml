@@ -88,11 +88,17 @@ jobs:
             core.setOutput("comment-id", comment.data.id);
 
       - name: Delete review app
+        id: delete-review-app
         uses: ./.github/actions/cpflow-delete-control-plane-app
         with:
           app_name: ${{ env.APP_NAME }}
           cpln_org: ${{ vars.CPLN_ORG_STAGING }}
           review_app_prefix: ${{ vars.REVIEW_APP_PREFIX }}
+
+      - name: Delete shared Postgres database secret
+        if: always() && steps.delete-review-app.outcome == 'success'
+        shell: bash
+        run: script/control-plane/delete-shared-postgres-secret
 
       - name: Finalize delete status
         if: always()

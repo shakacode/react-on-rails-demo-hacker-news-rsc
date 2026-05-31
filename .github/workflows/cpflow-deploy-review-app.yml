@@ -55,6 +55,7 @@ jobs:
           missing=()
 
           [[ -n "${{ secrets.CPLN_TOKEN_STAGING }}" ]] || missing+=("secret:CPLN_TOKEN_STAGING")
+          [[ -n "${{ secrets.SHARED_POSTGRES_URL_PREFIX }}" ]] || missing+=("secret:SHARED_POSTGRES_URL_PREFIX")
           [[ -n "${{ vars.CPLN_ORG_STAGING }}" ]] || missing+=("variable:CPLN_ORG_STAGING")
           [[ -n "${{ vars.REVIEW_APP_PREFIX }}" ]] || missing+=("variable:REVIEW_APP_PREFIX")
 
@@ -65,7 +66,7 @@ jobs:
                 echo "Control Plane review app automation is not configured yet."
                 echo
                 echo "Missing required GitHub configuration:"
-                printf -- '- `%s`\n' "${missing[@]}"
+                printf -- "- \`%s\`\\n" "${missing[@]}"
                 echo
                 echo "Pushes to this pull request will skip review app deploys until the repository is configured."
               } >> "$GITHUB_STEP_SUMMARY"
@@ -112,9 +113,11 @@ jobs:
             same_repo="true"
           fi
 
-          echo "PR_NUMBER=$pr_number" >> "$GITHUB_ENV"
-          echo "APP_NAME=${{ vars.REVIEW_APP_PREFIX }}-$pr_number" >> "$GITHUB_ENV"
-          echo "PR_SHA=$pr_sha" >> "$GITHUB_ENV"
+          {
+            echo "PR_NUMBER=$pr_number"
+            echo "APP_NAME=${{ vars.REVIEW_APP_PREFIX }}-$pr_number"
+            echo "PR_SHA=$pr_sha"
+          } >> "$GITHUB_ENV"
           echo "same_repo=${same_repo}" >> "$GITHUB_OUTPUT"
 
       - name: Validate review app deployment source
@@ -196,6 +199,20 @@ jobs:
         run: |
           set -euo pipefail
           cpflow setup-app -a "${APP_NAME}" --org "${CPLN_ORG}"
+
+      - name: Ensure shared Postgres identity and database secret
+        if: steps.config.outputs.ready == 'true' && steps.source.outputs.allowed == 'true' && (steps.check-app.outputs.exists == 'true' || steps.setup-review-app.outcome == 'success')
+        env:
+          SHARED_POSTGRES_URL_PREFIX: ${{ secrets.SHARED_POSTGRES_URL_PREFIX }}
+        shell: bash
+        run: script/control-plane/ensure-shared-postgres-secret
+
+      - name: Apply shared Postgres app template to existing review app
+        if: steps.config.outputs.ready == 'true' && steps.source.outputs.allowed == 'true' && steps.check-app.outputs.exists == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          cpflow apply-template app-shared-postgres -a "${APP_NAME}" --org "${CPLN_ORG}" --yes
 
       - name: Create initial PR comment
         if: steps.config.outputs.ready == 'true' && steps.source.outputs.allowed == 'true' && (steps.check-app.outputs.exists == 'true' || steps.setup-review-app.outcome == 'success')

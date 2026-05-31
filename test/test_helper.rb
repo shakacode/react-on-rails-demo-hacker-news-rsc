@@ -9,7 +9,7 @@ require_relative "support/node_renderer_test_server"
 
 FakeHackerNewsAPI.start!
 ENV["HN_API_BASE_URL"] = FakeHackerNewsAPI.base_url
-FileUtils.rm_rf(Rails.root.join(".node-renderer-bundles"))
+FileUtils.rm_rf(Rails.root.join("tmp/.node-renderer-bundles"))
 generated_server_bundle_path = Rails.root.join("app/javascript/generated/server-bundle-generated.js")
 
 unless generated_server_bundle_path.exist?
