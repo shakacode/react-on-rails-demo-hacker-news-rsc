@@ -2,6 +2,7 @@
 // https://github.com/shakacode/react_on_rails_demo_ssr_hmr/blob/master/config/webpack/serverWebpackConfig.js
 
 const { merge, config } = require('shakapacker');
+const path = require('path');
 const commonWebpackConfig = require('./commonWebpackConfig');
 
 const bundler = config.assets_bundler === 'rspack'
@@ -68,7 +69,6 @@ const configureServer = (rscBundle = false) => {
   // Using Shakapacker 9.0+ privateOutputPath for automatic sync with shakapacker.yml
   // This eliminates manual path configuration and keeps configs in sync.
   // Falls back to hardcoded path if private_output_path is not configured.
-  const path = require('path');
   const privateOutputPath = config.privateOutputPath || config.private_output_path;
   const resolvedPrivateOutputPath = privateOutputPath
     ? (path.isAbsolute(privateOutputPath)

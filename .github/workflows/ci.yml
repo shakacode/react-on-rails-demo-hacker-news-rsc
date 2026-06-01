@@ -96,6 +96,14 @@ jobs:
         with:
           bundler-cache: true
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          run_install: false
+
+      - name: Install JavaScript packages
+        run: pnpm install --frozen-lockfile
+
       - name: Run tests
         env:
           RAILS_ENV: test
@@ -149,6 +157,14 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          run_install: false
+
+      - name: Install JavaScript packages
+        run: pnpm install --frozen-lockfile
 
       - name: Run System Tests
         env:

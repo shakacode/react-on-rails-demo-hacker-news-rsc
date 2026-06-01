@@ -24,6 +24,10 @@ It supersedes the older [`shakacode/react-on-rails-hn-rsc-demo`](https://github.
 
 For the repo comparison and recommended archive handoff, see [docs/repo-status-and-archive-plan.md](docs/repo-status-and-archive-plan.md).
 
+Related:
+
+- [react-on-rails-starter-tanstack](https://github.com/shakacode/react-on-rails-starter-tanstack) - the 2026 TanStack-first starter that shares the Rails + React on Rails Pro patterns behind this public-traffic RSC demo.
+
 ## Live Demo
 
 - Public deployment: not configured yet
