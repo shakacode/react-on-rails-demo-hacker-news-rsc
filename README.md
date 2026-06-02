@@ -14,6 +14,15 @@ Reference projects:
 
 - [Epic: Hacker News RSC Demo for React on Rails Pro](https://github.com/shakacode/react_on_rails-demos/issues/70)
 - [Vercel next-react-server-components](https://github.com/vercel/next-react-server-components)
+- [Legacy implementation workspace](https://github.com/shakacode/react-on-rails-hn-rsc-demo)
+
+## Repository Status
+
+[`shakacode/react-on-rails-demo-hacker-news-rsc`](https://github.com/shakacode/react-on-rails-demo-hacker-news-rsc) is the canonical public Hacker News RSC demo for React on Rails Pro.
+
+It supersedes the older [`shakacode/react-on-rails-hn-rsc-demo`](https://github.com/shakacode/react-on-rails-hn-rsc-demo) repo, which is still useful as historical implementation context but is no longer the best public entry point.
+
+For the repo comparison and recommended archive handoff, see [docs/repo-status-and-archive-plan.md](docs/repo-status-and-archive-plan.md).
 
 Related:
 
@@ -202,6 +211,10 @@ apply_public_cache(ttl: 5.minutes, etag: [ "item", @hn_item_props[:itemId] ])
 That means the app can use Rails cache headers, ETags, and 404 responses without giving up streamed RSC rendering.
 
 ## Comparison with the Next.js Version
+
+For a detailed compare-and-contrast, including local benchmark notes and “when to choose which” guidance, see [docs/react-on-rails-pro-vs-nextjs.md](docs/react-on-rails-pro-vs-nextjs.md).
+
+For implementation follow-ups, upstream product improvement ideas, documentation gaps, and recommended next questions, see [docs/react-on-rails-pro-lessons-learned.md](docs/react-on-rails-pro-lessons-learned.md).
 
 | Concern | Next.js Reference | This App |
 | --- | --- | --- |
