@@ -306,14 +306,14 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
-    react_on_rails (17.0.0.rc.1)
+    react_on_rails (17.0.0.rc.2)
       addressable
       connection_pool
       execjs (~> 2.5)
       rails (>= 5.2)
       rainbow (~> 3.0)
       shakapacker (>= 6.0)
-    react_on_rails_pro (17.0.0.rc.1)
+    react_on_rails_pro (17.0.0.rc.2)
       addressable
       async (>= 2.29)
       async-http (~> 0.95)
@@ -321,7 +321,7 @@ GEM
       io-endpoint (~> 0.17.0)
       jwt (>= 2.5, < 4)
       rainbow
-      react_on_rails (= 17.0.0.rc.1)
+      react_on_rails (= 17.0.0.rc.2)
     regexp_parser (2.11.3)
     reline (0.6.3)
       io-console (~> 0.5)
@@ -364,7 +364,7 @@ GEM
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
     semantic_range (3.1.1)
-    shakapacker (9.5.0)
+    shakapacker (10.1.0)
       activesupport (>= 5.2)
       package_json
       rack-proxy (>= 0.6.1)
@@ -448,11 +448,11 @@ DEPENDENCIES
   propshaft
   puma (>= 5.0)
   rails (~> 8.1.2)
-  react_on_rails (= 17.0.0.rc.1)
-  react_on_rails_pro (= 17.0.0.rc.1)
+  react_on_rails (= 17.0.0.rc.2)
+  react_on_rails_pro (= 17.0.0.rc.2)
   rubocop-rails-omakase
   selenium-webdriver
-  shakapacker (= 9.5)
+  shakapacker (= 10.1.0)
   solid_cable
   solid_cache
   solid_queue
@@ -579,8 +579,8 @@ CHECKSUMS
   rainbow (3.1.1) sha256=039491aa3a89f42efa1d6dec2fc4e62ede96eb6acd95e52f1ad581182b79bc6a
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
   rdoc (7.2.0) sha256=8650f76cd4009c3b54955eb5d7e3a075c60a57276766ebf36f9085e8c9f23192
-  react_on_rails (17.0.0.rc.1) sha256=91a48c4eb0a950d3d7c63e505f2259ff206aa7a6420f03681c2ac4c8874baee9
-  react_on_rails_pro (17.0.0.rc.1) sha256=e3579dcb3fa2e8f573be39d92f341ff5e727c6a137101fddaed5fba16a81ee76
+  react_on_rails (17.0.0.rc.2) sha256=4ab16401e76e6147fefd1b2f4d514d96558662f21460c2ca9fb5b1622fe91604
+  react_on_rails_pro (17.0.0.rc.2) sha256=8c0e3a9639ce28566a97e6224ba57ff676fbd101262c6396fd449c8b52beadf8
   regexp_parser (2.11.3) sha256=ca13f381a173b7a93450e53459075c9b76a10433caadcb2f1180f2c741fc55a4
   reline (0.6.3) sha256=1198b04973565b36ec0f11542ab3f5cfeeec34823f4e54cebde90968092b1835
   rexml (3.4.4) sha256=19e0a2c3425dfbf2d4fc1189747bdb2f849b6c5e74180401b15734bc97b5d142
@@ -594,7 +594,7 @@ CHECKSUMS
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
   selenium-webdriver (4.44.0) sha256=6f1df072529af369589c46f0e01132952aabb250cfd683c274d74dc1eb5d8477
   semantic_range (3.1.1) sha256=508333196ef0c7ba33e79579d4df7eb0a41080595e6a655c2515b03d634ec4a9
-  shakapacker (9.5.0) sha256=6b589291210c52641d6881b05b4dbb2fed87dd3083caad2a6fb2af12dc3f39a8
+  shakapacker (10.1.0) sha256=69017102e169ea3baeb26b71b27223ff2689b987770867bf054f48ed71d63da9
   solid_cable (4.0.0) sha256=8379680ef6bf36e195eb876a6306ea290f87d5fa10bc4a757bc2a918f83229b5
   solid_cache (1.0.10) sha256=bc05a2fb3ac78a6f43cbb5946679cf9db67dd30d22939ededc385cb93e120d41
   solid_queue (1.4.0) sha256=e6a18d196f0b27cb6e3c77c5b31258b05fb634f8ed64fb1866ed164047216c2a
