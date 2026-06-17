@@ -33,11 +33,11 @@ importers:
         specifier: 19.0.4
         version: 19.0.4(react@19.0.4)
       react-on-rails-pro:
-        specifier: 17.0.0-rc.3
-        version: 17.0.0-rc.3(react-dom@19.0.4(react@19.0.4))(react-on-rails-rsc@19.0.5-rc.7(react-dom@19.0.4(react@19.0.4))(react@19.0.4)(webpack@5.105.2))(react@19.0.4)
+        specifier: 17.0.0-rc.5
+        version: 17.0.0-rc.5(react-dom@19.0.4(react@19.0.4))(react-on-rails-rsc@19.0.5-rc.7(react-dom@19.0.4(react@19.0.4))(react@19.0.4)(webpack@5.105.2))(react@19.0.4)
       react-on-rails-pro-node-renderer:
-        specifier: 17.0.0-rc.3
-        version: 17.0.0-rc.3
+        specifier: 17.0.0-rc.5
+        version: 17.0.0-rc.5
       react-on-rails-rsc:
         specifier: 19.0.5-rc.7
         version: 19.0.5-rc.7(react-dom@19.0.4(react@19.0.4))(react@19.0.4)(webpack@5.105.2)
@@ -2038,8 +2038,9 @@ packages:
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
-  react-on-rails-pro-node-renderer@17.0.0-rc.3:
-    resolution: {integrity: sha512-Red3GaNEF33XhjtfCSkYAM4+GEoiCEjP0Yt1eknH5LmWqVnO1NMqWoFhtBfxaVr/K++qTVYY5yV28iNh6gTqzg==}
+  react-on-rails-pro-node-renderer@17.0.0-rc.5:
+    resolution: {integrity: sha512-/eETpzMsm4wGsH/RNB2wBQXG0KNCs66EJ2PdaLeN1Vj9zOw7ubwEhkCx3pKFngvoEfz0uD4n8DQ4Nbn0kE1XZg==}
+    engines: {node: '>=18.19.0'}
     peerDependencies:
       '@fastify/otel': '>=0.18.0 <1.0.0'
       '@honeybadger-io/js': '>=4.0.0'
@@ -2079,8 +2080,8 @@ packages:
       '@sentry/tracing':
         optional: true
 
-  react-on-rails-pro@17.0.0-rc.3:
-    resolution: {integrity: sha512-DzBHKrDX+bHY2ojnNjH5cNxFXmwIncaL3SQL1SCVibU+G2I32IV8gKB3cUTZgNhMY3p1Onsgjt/cVt0x6+Cqhw==}
+  react-on-rails-pro@17.0.0-rc.5:
+    resolution: {integrity: sha512-To39DalhoTev2SF453sRTOWqDLvWQTwHBRO9n+WDU08TBK7Gew4ZRLDEuEAPGwKkSfdlht/7NpJuchaGmW1nLA==}
     peerDependencies:
       '@tanstack/react-router': '>=1.139.0 <2.0.0'
       ioredis: '>= 5'
@@ -2102,8 +2103,8 @@ packages:
       react-dom: ^19.0.4
       webpack: ^5.59.0
 
-  react-on-rails@17.0.0-rc.3:
-    resolution: {integrity: sha512-VpLWgVt4mE6ETo1mGj5yLCL/sEK+SPYIut7nVqx10HY0F/P1IQodEWm18IYQ5ZBBxdAngvSsOArjypVUcFLP0w==}
+  react-on-rails@17.0.0-rc.5:
+    resolution: {integrity: sha512-4D6EtFotEKqlAV8YU1/41hMSwOmqrJPYkRIlzONbsaDqPOq8rgxj4w1t/G2mRaQLlpRcTnqcvRaSsSds4ofUXw==}
     peerDependencies:
       react: '>= 16'
       react-dom: '>= 16'
@@ -4787,7 +4788,7 @@ snapshots:
 
   react-is@16.13.1: {}
 
-  react-on-rails-pro-node-renderer@17.0.0-rc.3:
+  react-on-rails-pro-node-renderer@17.0.0-rc.5:
     dependencies:
       '@fastify/formbody': 8.0.2
       '@fastify/multipart': 9.4.0
@@ -4797,11 +4798,11 @@ snapshots:
       lockfile: 1.0.4
       pino: 10.3.1
 
-  react-on-rails-pro@17.0.0-rc.3(react-dom@19.0.4(react@19.0.4))(react-on-rails-rsc@19.0.5-rc.7(react-dom@19.0.4(react@19.0.4))(react@19.0.4)(webpack@5.105.2))(react@19.0.4):
+  react-on-rails-pro@17.0.0-rc.5(react-dom@19.0.4(react@19.0.4))(react-on-rails-rsc@19.0.5-rc.7(react-dom@19.0.4(react@19.0.4))(react@19.0.4)(webpack@5.105.2))(react@19.0.4):
     dependencies:
       react: 19.0.4
       react-dom: 19.0.4(react@19.0.4)
-      react-on-rails: 17.0.0-rc.3(react-dom@19.0.4(react@19.0.4))(react@19.0.4)
+      react-on-rails: 17.0.0-rc.5(react-dom@19.0.4(react@19.0.4))(react@19.0.4)
     optionalDependencies:
       react-on-rails-rsc: 19.0.5-rc.7(react-dom@19.0.4(react@19.0.4))(react@19.0.4)(webpack@5.105.2)
 
@@ -4814,7 +4815,7 @@ snapshots:
       webpack: 5.105.2(@swc/core@1.15.11)(webpack-cli@6.0.1)
       webpack-sources: 3.3.4
 
-  react-on-rails@17.0.0-rc.3(react-dom@19.0.4(react@19.0.4))(react@19.0.4):
+  react-on-rails@17.0.0-rc.5(react-dom@19.0.4(react@19.0.4))(react@19.0.4):
     dependencies:
       react: 19.0.4
       react-dom: 19.0.4(react@19.0.4)
