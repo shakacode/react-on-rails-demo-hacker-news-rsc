@@ -27,6 +27,7 @@ For the repo comparison and recommended archive handoff, see [docs/repo-status-a
 Related:
 
 - [react-on-rails-starter-tanstack](https://github.com/shakacode/react-on-rails-starter-tanstack) - the 2026 TanStack-first starter that shares the Rails + React on Rails Pro patterns behind this public-traffic RSC demo.
+- [Using TanStack Query](https://reactonrails.com/docs/building-features/tanstack-query) - the canonical guide to client-side server-state (caching, mutations, pagination) against a Rails JSON API, the complement to this demo's RSC rendering.
 
 ## Live Demo
 
