@@ -13,7 +13,7 @@ class BundlerSwitcher
 
   RSPACK_DEPS = {
     dependencies: %w[@rspack/core rspack-manifest-plugin],
-    dev_dependencies: %w[@rspack/cli @rspack/plugin-react-refresh]
+    dev_dependencies: %w[@rspack/cli @rspack/dev-server @rspack/plugin-react-refresh]
   }.freeze
 
   def initialize(target_bundler)
