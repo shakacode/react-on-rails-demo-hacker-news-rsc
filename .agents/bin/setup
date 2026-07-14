@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Managed by shakacode/agent-workflows; this repo owns the command below.
+set -euo pipefail
+root="$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)"
+cd "$root"
+exec bin/setup "$@"
