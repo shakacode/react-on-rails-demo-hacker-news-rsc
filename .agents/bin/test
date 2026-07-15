@@ -3,4 +3,8 @@
 set -euo pipefail
 root="$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)"
 cd "$root"
-exec bin/rails test "$@"
+
+# Prepare the test database explicitly; `bin/rails test` does not guarantee a
+# fresh checkout has run test-environment database setup first.
+RAILS_ENV=test bin/rails db:prepare
+exec env RAILS_ENV=test bin/rails test "$@"

@@ -7,9 +7,9 @@ means that capability is n/a here.
 
 | Script | Purpose | This repo runs |
 | --- | --- | --- |
-| `setup` | Install dependencies | `bin/setup` |
+| `setup` | Install dependencies without starting a development server | `bin/setup --skip-server` |
 | `validate` | Pre-push gate | `bin/ci` |
-| `test` | Run tests | `bin/rails test` |
+| `test` | Prepare the test database, then run tests | `RAILS_ENV=test bin/rails db:prepare && bin/rails test` |
 | `lint` | Run lint checks | `bin/rubocop` |
 | `build` | Build artifacts | n/a |
 | `docs` | Validate documentation | n/a |
