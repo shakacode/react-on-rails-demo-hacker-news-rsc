@@ -3,4 +3,6 @@
 set -euo pipefail
 root="$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)"
 cd "$root"
-exec bin/setup "$@"
+# `bin/setup` starts `bin/dev` unless this flag is present. Agent setup must
+# finish instead of taking ownership of a development server.
+exec bin/setup --skip-server "$@"
