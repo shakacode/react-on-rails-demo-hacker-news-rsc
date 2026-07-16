@@ -1,0 +1,31 @@
+# Internal React on Rails Pro renderer used by Rails for SSR and RSC responses.
+kind: workload
+name: node-renderer
+spec:
+  type: standard
+  containers:
+    - name: node-renderer
+      cpu: 300m
+      inheritEnv: true
+      image: "{{APP_IMAGE_LINK}}"
+      memory: 512Mi
+      command: node
+      args:
+        - client/node-renderer.js
+      ports:
+        - number: 3800
+          protocol: tcp
+  defaultOptions:
+    autoscaling:
+      minScale: 1
+      maxScale: 1
+      metric: disabled
+    capacityAI: true
+  firewallConfig:
+    internal:
+      inboundAllowType: same-gvc
+    external:
+      inboundAllowCIDR: []
+      outboundAllowCIDR:
+        - 0.0.0.0/0
+  identityLink: "{{APP_IDENTITY_LINK}}"
