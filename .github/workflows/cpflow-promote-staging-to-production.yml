@@ -567,6 +567,8 @@ jobs:
         run: |
           set -euo pipefail
 
+          echo "deployment_attempted=true" >> "$GITHUB_OUTPUT"
+
           deploy_args=(-a "${PRODUCTION_APP_NAME}")
           if [[ -n "${RELEASE_PHASE_FLAG}" ]]; then
             deploy_args+=("${RELEASE_PHASE_FLAG}")
@@ -590,7 +592,7 @@ jobs:
           accepted_statuses: ${{ env.HEALTH_CHECK_ACCEPTED_STATUSES }}
 
       - name: Roll back on failure
-        if: failure() && steps.capture-current.outcome == 'success' && steps.deploy-production.outcome == 'success'
+        if: failure() && steps.capture-current.outcome == 'success' && steps.deploy-production.outputs.deployment_attempted == 'true'
         env:
           ROLLBACK_STATE: ${{ steps.capture-current.outputs.rollback_state }}
           PRODUCTION_APP_NAME: ${{ vars.PRODUCTION_APP_NAME }}
@@ -652,7 +654,7 @@ jobs:
           fi
 
       - name: Wait for rollback readiness
-        if: failure() && steps.capture-current.outcome == 'success' && steps.deploy-production.outcome == 'success'
+        if: failure() && steps.capture-current.outcome == 'success' && steps.deploy-production.outputs.deployment_attempted == 'true'
         env:
           ROLLBACK_STATE: ${{ steps.capture-current.outputs.rollback_state }}
           PRODUCTION_APP_NAME: ${{ vars.PRODUCTION_APP_NAME }}
