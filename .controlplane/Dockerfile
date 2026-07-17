@@ -84,10 +84,10 @@ ENV RAILS_ENV=production
 # compiling assets requires any value for ENV of SECRET_KEY_BASE
 ENV SECRET_KEY_BASE=NOT_USED_NON_BLANK
 
-RUN bin/shakapacker-precompile-hook
+RUN RENDERER_PASSWORD=NOT_USED_DURING_BUILD bin/shakapacker-precompile-hook
 
 
-RUN rails assets:precompile
+RUN RENDERER_PASSWORD=NOT_USED_DURING_BUILD rails assets:precompile
 
 # add entrypoint
 COPY .controlplane/entrypoint.sh ./
