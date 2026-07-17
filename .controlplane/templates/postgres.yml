@@ -22,6 +22,7 @@ name: "{{APP_NAME}}-pg"
 description: ''
 type: dictionary
 data:
+  database_url: "postgres://the_user:the_password@postgres.{{APP_NAME}}.cpln.local:5432/{{APP_NAME}}"
   password: the_password #Replace this with a real password
   username: the_user     #Replace this with a real username
 

@@ -3,7 +3,14 @@ const { reactOnRailsProNodeRenderer } = require('react-on-rails-pro-node-rendere
 
 const { env } = process;
 const runtimeEnvironments = [env.RAILS_ENV, env.NODE_ENV].filter(Boolean);
-const developmentLikeEnvironment = runtimeEnvironments.every((value) => ['development', 'test'].includes(value));
+const developmentLikeEnvironment =
+  runtimeEnvironments.length > 0 &&
+  runtimeEnvironments.every((value) => ['development', 'test'].includes(value));
+const rendererPassword = env.RENDERER_PASSWORD || (developmentLikeEnvironment ? 'devPassword' : undefined);
+
+if (!rendererPassword) {
+  throw new Error('RENDERER_PASSWORD must be set outside development/test');
+}
 
 const config = {
   serverBundleCachePath: path.resolve(__dirname, '../.node-renderer-bundles'),
@@ -11,7 +18,7 @@ const config = {
   logLevel: env.RENDERER_LOG_LEVEL || 'info',
 
   // See value in /config/initializers/react_on_rails_pro.rb
-  password: env.RENDERER_PASSWORD || (developmentLikeEnvironment ? 'devPassword' : undefined),
+  password: rendererPassword,
 
   // Number of Node.js worker threads for SSR rendering
   // Set NODE_RENDERER_CONCURRENCY env var to override (e.g., for production tuning)
