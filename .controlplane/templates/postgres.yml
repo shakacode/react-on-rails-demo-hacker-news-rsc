@@ -23,6 +23,9 @@ description: ''
 type: dictionary
 data:
   database_url: "postgres://the_user:the_password@postgres.{{APP_NAME}}.cpln.local:5432/{{APP_NAME}}"
+  cache_database_url: "postgres://the_user:the_password@postgres.{{APP_NAME}}.cpln.local:5432/{{APP_NAME}}_cache"
+  queue_database_url: "postgres://the_user:the_password@postgres.{{APP_NAME}}.cpln.local:5432/{{APP_NAME}}_queue"
+  cable_database_url: "postgres://the_user:the_password@postgres.{{APP_NAME}}.cpln.local:5432/{{APP_NAME}}_cable"
   password: the_password #Replace this with a real password
   username: the_user     #Replace this with a real username
 

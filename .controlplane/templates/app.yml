@@ -5,6 +5,12 @@ spec:
   env:
     - name: DATABASE_URL
       value: "cpln://secret/{{APP_NAME}}-pg.database_url"
+    - name: CACHE_DATABASE_URL
+      value: "cpln://secret/{{APP_NAME}}-pg.cache_database_url"
+    - name: QUEUE_DATABASE_URL
+      value: "cpln://secret/{{APP_NAME}}-pg.queue_database_url"
+    - name: CABLE_DATABASE_URL
+      value: "cpln://secret/{{APP_NAME}}-pg.cable_database_url"
     - name: RAILS_ENV
       value: production
     - name: RAILS_LOG_TO_STDOUT
