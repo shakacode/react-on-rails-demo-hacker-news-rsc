@@ -13,6 +13,12 @@ ARG PNPM_FALLBACK_VERSION=9.12.3
 
 WORKDIR /app
 
+# Native gems such as bigdecimal and pg compile during bundle install. The slim
+# Ruby image deliberately omits the compiler and development headers they need.
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config && \
+    rm -rf /var/lib/apt/lists/*
+
 # Keep Node.js available both for asset compilation and for SSR runtimes that
 # rely on ExecJS in production. Narrowed to just what the node stage actually
 # ships under /usr/local so we don't drag in unused Debian libs from that image.
