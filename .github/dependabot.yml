@@ -7,11 +7,14 @@ updates:
   - package-ecosystem: "bundler"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     open-pull-requests-limit: 5
     cooldown:
       default-days: 3
     groups:
+      react-on-rails-product-family:
+        patterns:
+          - "react_on_rails*"
       ruby:
         patterns:
           - "*"
@@ -19,11 +22,19 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     open-pull-requests-limit: 5
     cooldown:
       default-days: 3
+    ignore:
+      # Shakapacker 10 supports webpack 5; keep Dependabot from proposing an
+      # incompatible webpack 6 migration before the integration supports it.
+      - dependency-name: "webpack"
+        versions: [">= 6.0.0"]
     groups:
+      react-on-rails-product-family:
+        patterns:
+          - "react-on-rails*"
       javascript:
         patterns:
           - "*"
@@ -31,7 +42,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
     open-pull-requests-limit: 5
     cooldown:
       default-days: 3

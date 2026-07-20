@@ -1,0 +1,61 @@
+name: Demo fleet smoke
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "23 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    uses: shakacode/react_on_rails/.github/workflows/demo-fleet-smoke.yml@613c6c2a251a782328b26d68e7f23daa9b677497
+    with:
+      ruby-version: "3.4.3"
+      node-version: "24.8.0"
+      install-command: >-
+        docker run --detach --rm --name demo-fleet-postgres
+        --env POSTGRES_USER=react_on_rails_hacker_news_app
+        --env POSTGRES_PASSWORD=demo-fleet-postgres-password
+        --env POSTGRES_DB=postgres --publish 5433:5432
+        postgres@sha256:33f923b05f64ca54ac4401c01126a6b92afe839a0aa0a52bc5aeb5cc958e5f20 &&
+        for attempt in $(seq 1 60); do
+        docker exec demo-fleet-postgres pg_isready
+        -U react_on_rails_hacker_news_app -d postgres && break; sleep 1; done &&
+        docker exec demo-fleet-postgres pg_isready
+        -U react_on_rails_hacker_news_app -d postgres &&
+        corepack enable && corepack prepare pnpm@10.22.0 --activate &&
+        pnpm install --frozen-lockfile &&
+        bundle config set --local path vendor/bundle &&
+        bundle config set --local deployment true && bundle install
+      test-command: >-
+        export RAILS_ENV=test PGHOST=127.0.0.1 PGPORT=5433
+        PGUSER=react_on_rails_hacker_news_app PGPASSWORD=demo-fleet-postgres-password &&
+        bin/rails db:prepare && bin/rails test && bin/rails test:system
+      build-command: >-
+        RAILS_ENV=production SECRET_KEY_BASE=demo-fleet-smoke-key-not-for-production
+        bin/rails react_on_rails:generate_packs &&
+        RAILS_ENV=production SECRET_KEY_BASE=demo-fleet-smoke-key-not-for-production bin/shakapacker
+      smoke-command: >-
+        export RAILS_ENV=production SECRET_KEY_BASE=demo-fleet-smoke-key-not-for-production
+        PGHOST=127.0.0.1 PGPORT=5433
+        REACT_ON_RAILS_HACKER_NEWS_APP_DATABASE_PASSWORD=demo-fleet-postgres-password &&
+        export RENDERER_PASSWORD=demo-fleet-renderer-password &&
+        (CI=true node client/node-renderer.js & renderer_pid=$!;
+        trap 'kill "$renderer_pid" 2>/dev/null || true' EXIT;
+        for attempt in $(seq 1 60); do
+        nc -z 127.0.0.1 3800 && break;
+        kill -0 "$renderer_pid" 2>/dev/null || exit 1; sleep 1; done;
+        nc -z 127.0.0.1 3800 || exit 1;
+        bin/rails db:prepare &&
+        (bin/rails server -p 3100 & server_pid=$!;
+        trap 'kill "$server_pid" "$renderer_pid" 2>/dev/null || true' EXIT;
+        curl --fail --silent --show-error --max-time 60 --retry 10 --retry-connrefused
+        --output /dev/null http://127.0.0.1:3100/ &&
+        curl --fail --silent --show-error --max-time 60 --retry 10 --retry-connrefused
+        --output /dev/null http://127.0.0.1:3100/news/1))
