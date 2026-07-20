@@ -24,17 +24,23 @@ jobs:
         --env POSTGRES_PASSWORD=demo-fleet-postgres-password
         --env POSTGRES_DB=postgres --publish 5433:5432
         postgres@sha256:33f923b05f64ca54ac4401c01126a6b92afe839a0aa0a52bc5aeb5cc958e5f20 &&
-        until docker exec demo-fleet-postgres pg_isready
-        -U react_on_rails_hacker_news_app -d postgres; do sleep 1; done &&
+        for attempt in $(seq 1 60); do
+        docker exec demo-fleet-postgres pg_isready
+        -U react_on_rails_hacker_news_app -d postgres && break; sleep 1; done &&
+        docker exec demo-fleet-postgres pg_isready
+        -U react_on_rails_hacker_news_app -d postgres &&
         corepack enable && corepack prepare pnpm@10.22.0 --activate &&
         pnpm install --frozen-lockfile &&
         bundle config set --local path vendor/bundle &&
         bundle config set --local deployment true && bundle install
       test-command: >-
-        export PGHOST=127.0.0.1 PGPORT=5433
+        export RAILS_ENV=test PGHOST=127.0.0.1 PGPORT=5433
         PGUSER=react_on_rails_hacker_news_app PGPASSWORD=demo-fleet-postgres-password &&
         bin/rails db:prepare && bin/rails test && bin/rails test:system
-      build-command: bin/rails react_on_rails:generate_packs && bin/shakapacker
+      build-command: >-
+        RAILS_ENV=production SECRET_KEY_BASE=demo-fleet-smoke-key-not-for-production
+        bin/rails react_on_rails:generate_packs &&
+        RAILS_ENV=production SECRET_KEY_BASE=demo-fleet-smoke-key-not-for-production bin/shakapacker
       smoke-command: >-
         export RAILS_ENV=production SECRET_KEY_BASE=demo-fleet-smoke-key-not-for-production
         PGHOST=127.0.0.1 PGPORT=5433
@@ -42,7 +48,10 @@ jobs:
         export RENDERER_PASSWORD=demo-fleet-renderer-password &&
         (CI=true node client/node-renderer.js & renderer_pid=$!;
         trap 'kill "$renderer_pid" 2>/dev/null || true' EXIT;
-        until nc -z 127.0.0.1 3800; do sleep 1; done;
+        for attempt in $(seq 1 60); do
+        nc -z 127.0.0.1 3800 && break;
+        kill -0 "$renderer_pid" 2>/dev/null || exit 1; sleep 1; done;
+        nc -z 127.0.0.1 3800 || exit 1;
         bin/rails db:prepare &&
         (bin/rails server -p 3100 & server_pid=$!;
         trap 'kill "$server_pid" "$renderer_pid" 2>/dev/null || true' EXIT;
