@@ -9,3 +9,4 @@ merge_ledger: "n/a"
 ci_parity_environment: "GitHub Actions ubuntu-latest with Ruby, Node.js 24.8.0, pnpm 10.22.0, and PostgreSQL"
 hosted_ci_trigger: "n/a — CI runs on every pull request"
 ci_change_detector: "n/a"
+repo_prefix: RORHN
