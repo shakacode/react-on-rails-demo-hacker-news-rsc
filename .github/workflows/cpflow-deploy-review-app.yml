@@ -24,7 +24,7 @@ jobs:
       (github.event_name == 'pull_request' &&
        github.event.pull_request.head.repo.full_name == github.repository) ||
       github.event_name == 'workflow_dispatch'
-    uses: shakacode/control-plane-flow/.github/workflows/cpflow-deploy-review-app.yml@v5.2.0
+    uses: shakacode/control-plane-flow/.github/workflows/cpflow-deploy-review-app.yml@1d1ec7f7af181c5c6cf07f512ce336dbdb367246
     secrets:
       CPLN_TOKEN_STAGING: ${{ secrets.CPLN_TOKEN_STAGING }}
       DOCKER_BUILD_SSH_KEY: ${{ secrets.DOCKER_BUILD_SSH_KEY }}

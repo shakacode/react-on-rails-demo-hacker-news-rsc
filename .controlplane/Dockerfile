@@ -91,7 +91,12 @@ RUN RENDERER_PASSWORD=NOT_USED_DURING_BUILD rails assets:precompile
 
 # add entrypoint
 COPY .controlplane/entrypoint.sh ./
-RUN chmod +x /app/entrypoint.sh
+RUN groupadd --system app && \
+    useradd --system --gid app --home-dir /app --no-create-home app && \
+    mkdir -p /app/tmp /app/log /app/.node-renderer-bundles && \
+    chown -R app:app /app && \
+    chmod +x /app/entrypoint.sh
+USER app
 ENTRYPOINT ["/app/entrypoint.sh"]
 
 CMD ["rails", "s"]

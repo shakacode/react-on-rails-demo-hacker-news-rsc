@@ -6,7 +6,12 @@ const runtimeEnvironments = [env.RAILS_ENV, env.NODE_ENV].filter(Boolean);
 const developmentLikeEnvironment =
   runtimeEnvironments.length > 0 &&
   runtimeEnvironments.every((value) => ['development', 'test'].includes(value));
-const rendererPassword = env.RENDERER_PASSWORD || (developmentLikeEnvironment ? 'devPassword' : undefined);
+const configuredRendererPassword = env.RENDERER_PASSWORD;
+const rendererPassword = configuredRendererPassword?.trim()
+  ? configuredRendererPassword
+  : developmentLikeEnvironment
+    ? 'devPassword'
+    : undefined;
 
 if (!rendererPassword) {
   throw new Error('RENDERER_PASSWORD must be set outside development/test');

@@ -45,12 +45,13 @@ each persistent app; the temporary review-app value is exposed to trusted PR
 code by design. The Rails workload and internal `node-renderer` workload share
 this value to authenticate SSR/RSC requests.
 
-The PostgreSQL template stores `username`, `password`, and `database_url` in
-the app's `{{APP_NAME}}-pg` secret dictionary. Before a persistent deployment,
-replace all three defaults. `database_url` must use the same username and
-password as the PostgreSQL workload; Rails receives it through the
-`cpln://secret/{{APP_NAME}}-pg.database_url` reference rather than from a
-plaintext manifest value.
+The PostgreSQL template stores `username`, `password`, and all four database
+URLs (`database_url`, `cache_database_url`, `queue_database_url`, and
+`cable_database_url`) in the app's `{{APP_NAME}}-pg` secret dictionary. Before
+a persistent deployment, replace every default and ensure each URL uses the
+same rotated username and password as the PostgreSQL workload. Rails receives
+these values through `cpln://secret/...` references rather than plaintext
+manifest values.
 
 For public demos, starter staging apps, and long-lived review apps, keep the app
 workload `type: standard` with one warm replica, set its autoscaling metric to
