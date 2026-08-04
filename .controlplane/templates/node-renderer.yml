@@ -6,9 +6,14 @@ spec:
   containers:
     - name: node-renderer
       cpu: 300m
-      inheritEnv: true
+      # Keep the renderer isolated from Rails and database credentials; it only
+      # needs the shared renderer password to authenticate internal requests.
+      inheritEnv: false
       image: "{{APP_IMAGE_LINK}}"
       memory: 512Mi
+      env:
+        - name: RENDERER_PASSWORD
+          value: "cpln://secret/{{APP_SECRETS}}.RENDERER_PASSWORD"
       command: node
       args:
         - client/node-renderer.js
