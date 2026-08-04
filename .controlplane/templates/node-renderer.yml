@@ -31,6 +31,8 @@ spec:
       inboundAllowType: same-gvc
     external:
       inboundAllowCIDR: []
+      # Server-rendered Hacker News pages fetch the public Firebase API, so
+      # renderer egress cannot be restricted to internal Control Plane traffic.
       outboundAllowCIDR:
         - 0.0.0.0/0
   identityLink: "{{APP_IDENTITY_LINK}}"
