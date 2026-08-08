@@ -169,6 +169,12 @@ renderer_env = renderer.fetch("spec").fetch("containers").first.fetch("env")
 renderer_host = renderer_env.find { |entry| entry["name"] == "RENDERER_HOST" }
 abort "node renderer must explicitly bind RENDERER_HOST when inheritEnv is false" unless renderer_host&.fetch("value") == "0.0.0.0"
 
+review_app = YAML.load_file(".github/workflows/cpflow-deploy-review-app.yml", aliases: true)
+review_app_deploy = review_app.fetch("jobs").fetch("deploy")
+unless review_app_deploy.fetch("if").include?("github.actor != 'dependabot[bot]'")
+  abort "review-app deployment must skip Dependabot because Actions does not expose deployment secrets to its PR workflows"
+end
+
 summary = steps.find { |step| step["name"] == "Promotion summary" }
 abort "promotion summary step is missing" unless summary
 abort "promotion summary must gate success on workload readiness" unless summary.fetch("run").include?('WORKLOAD_READINESS_OUTCOME') && summary.fetch("run").include?('"${WORKLOAD_READINESS_OUTCOME}" == "success"')
