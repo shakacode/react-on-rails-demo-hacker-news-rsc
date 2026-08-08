@@ -19,6 +19,7 @@ jobs:
       ruby-version: "3.4.3"
       node-version: "24.8.0"
       install-command: >-
+        sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips42 &&
         docker run --detach --rm --name demo-fleet-postgres
         --env POSTGRES_USER=react_on_rails_hacker_news_app
         --env POSTGRES_PASSWORD=demo-fleet-postgres-password
