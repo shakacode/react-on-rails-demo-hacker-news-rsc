@@ -2,11 +2,13 @@
 # frozen_string_literal: true
 
 require "pathname"
+require "open3"
 
 USAGE = <<~USAGE
   Usage: bin/pin-cpflow-github-ref [--allow-moving-ref] <control-plane-flow-ref>
 
-  Use a release tag for normal operation, e.g. v5.0.0.
+  Use a release tag for normal operation, e.g. v5.0.0; it is resolved to its
+  immutable full commit SHA before workflow refs are written.
   Use a full 40-character commit SHA for temporary unreleased upstream testing.
   This updates generated reusable-workflow `uses:` refs plus the production
   workflow's pinned control-plane-flow checkout and setup validation ref.
@@ -42,19 +44,43 @@ unless positional.length == 1
   exit 1
 end
 
-ref = positional.first
+requested_ref = positional.first
 allow_moving_ref = options.include?("--allow-moving-ref")
 
-unless ref.match?(%r{\A[0-9A-Za-z._/-]+\z})
-  warn "Ref contains unsupported characters: #{ref.inspect}"
+unless requested_ref.match?(%r{\A[0-9A-Za-z._/-]+\z})
+  warn "Ref contains unsupported characters: #{requested_ref.inspect}"
   exit 1
 end
 
-unless ref.match?(FULL_COMMIT_SHA) || ref.match?(RELEASE_TAG) || allow_moving_ref
-  warn "Ref must be a full 40-character commit SHA or a v-prefixed release tag: #{ref.inspect}"
+unless requested_ref.match?(FULL_COMMIT_SHA) || requested_ref.match?(RELEASE_TAG) || allow_moving_ref
+  warn "Ref must be a full 40-character commit SHA or a v-prefixed release tag: #{requested_ref.inspect}"
   warn "Use --allow-moving-ref only for a short-lived branch/ref experiment."
   exit 1
 end
+
+ref =
+  if requested_ref.match?(RELEASE_TAG)
+    remote = "https://github.com/shakacode/control-plane-flow.git"
+    tag_ref = "refs/tags/#{requested_ref}"
+    stdout, status = Open3.capture2("git", "ls-remote", remote, tag_ref, "#{tag_ref}^{}")
+    unless status.success?
+      warn "Could not resolve release tag #{requested_ref.inspect} from #{remote}."
+      exit 1
+    end
+
+    resolved = stdout.lines.filter_map do |line|
+      sha, remote_ref = line.split
+      sha if remote_ref == "#{tag_ref}^{}" || remote_ref == tag_ref
+    end.last
+    unless resolved&.match?(FULL_COMMIT_SHA)
+      warn "Release tag #{requested_ref.inspect} did not resolve to a full commit SHA."
+      exit 1
+    end
+
+    resolved.downcase
+  else
+    requested_ref
+  end
 
 root = Pathname.new(__dir__).join("..").expand_path
 workflow_paths = Dir[root.join(".github/workflows/cpflow-*.yml")]
@@ -80,7 +106,7 @@ workflow_paths.each do |path|
   changed << Pathname.new(path).relative_path_from(root).to_s
 end
 
-puts "Pinned cpflow GitHub ref to #{ref}"
+puts "Pinned cpflow GitHub ref to #{ref}#{" (resolved from #{requested_ref})" if ref != requested_ref}"
 if changed.empty?
   puts "No files changed."
 else

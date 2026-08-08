@@ -601,6 +601,44 @@ jobs:
           interval_seconds: ${{ env.HEALTH_CHECK_INTERVAL }}
           accepted_statuses: ${{ env.HEALTH_CHECK_ACCEPTED_STATUSES }}
 
+      - name: Verify all deployed workloads are ready
+        id: workload-readiness
+        env:
+          PRODUCTION_APP_NAME: ${{ vars.PRODUCTION_APP_NAME }}
+          CPLN_ORG_PRODUCTION: ${{ steps.cpln-orgs.outputs.production }}
+          WORKLOAD_NAMES: ${{ steps.workloads.outputs.names }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Start pessimistic so an invalid zero-retry configuration cannot
+          # accidentally treat every workload as ready without polling it.
+          not_ready=("no workload readiness check ran")
+          for attempt in $(seq 1 "${HEALTH_CHECK_RETRIES}"); do
+            not_ready=()
+            while IFS= read -r workload_name; do
+              [[ -n "${workload_name}" ]] || continue
+              workload_status="$(cpln workload get "${workload_name}" --gvc "${PRODUCTION_APP_NAME}" --org "${CPLN_ORG_PRODUCTION}" -o json)"
+              ready="$(jq -r '.status.ready // false' <<< "${workload_status}")"
+              ready_latest="$(jq -r '.status.readyLatest // false' <<< "${workload_status}")"
+              if [[ "${ready}" != "true" || "${ready_latest}" != "true" ]]; then
+                not_ready+=("${workload_name}")
+              fi
+            done < <(tr ',' '\n' <<< "${WORKLOAD_NAMES}")
+
+            if [[ "${#not_ready[@]}" -eq 0 ]]; then
+              exit 0
+            fi
+
+            if [[ "${attempt}" -lt "${HEALTH_CHECK_RETRIES}" ]]; then
+              echo "Waiting for deployed workload(s): ${not_ready[*]}"
+              sleep "${HEALTH_CHECK_INTERVAL}"
+            fi
+          done
+
+          echo "::error::Deployed workload(s) did not report ready: ${not_ready[*]}"
+          exit 1
+
       - name: Roll back on failure
         id: rollback
         if: failure() && steps.capture-current.outcome == 'success' && steps.deploy-production.outputs.deployment_attempted == 'true'
@@ -665,6 +703,7 @@ jobs:
           fi
 
       - name: Wait for rollback readiness
+        id: rollback-readiness
         if: failure() && steps.capture-current.outcome == 'success' && steps.deploy-production.outputs.deployment_attempted == 'true'
         env:
           ROLLBACK_STATE: ${{ steps.capture-current.outputs.rollback_state }}
@@ -681,11 +720,12 @@ jobs:
           # linearly with the number of workloads. Each per-workload retry
           # loop runs in a backgrounded subshell that writes its final state
           # to a status file; the parent waits for all of them before
-          # aggregating warnings, keeping output ordered and deterministic.
+          # aggregating results, keeping output ordered and deterministic.
           status_dir="$(mktemp -d)"
           trap 'rm -rf "${status_dir}"' EXIT
 
           pids=()
+          rollback_not_ready=0
           for workload_name in "${workloads[@]}"; do
             [[ -n "${workload_name}" ]] || continue
             status_name="${workload_name//\//_}"
@@ -730,9 +770,14 @@ jobs:
             status_name="${workload_name//\//_}"
             status_file="${status_dir}/${status_name}"
             if [[ ! -f "${status_file}" ]] || [[ "$(<"${status_file}")" != "ready" ]]; then
-              echo "::warning::Workload '${workload_name}' did not report ready after rollback."
+              echo "::error::Workload '${workload_name}' did not report ready after rollback."
+              rollback_not_ready=$((rollback_not_ready + 1))
             fi
           done
+
+          if [[ "${rollback_not_ready}" -gt 0 ]]; then
+            exit 1
+          fi
 
       - name: Promotion summary
         if: always()
@@ -743,6 +788,7 @@ jobs:
           COPIED_IMAGE: ${{ steps.copy-image.outputs.image }}
           DEPLOYMENT_ATTEMPTED: ${{ steps.deploy-production.outputs.deployment_attempted }}
           ROLLBACK_OUTCOME: ${{ steps.rollback.outcome }}
+          ROLLBACK_READINESS_OUTCOME: ${{ steps.rollback-readiness.outcome }}
         shell: bash
         run: |
           {
@@ -751,7 +797,7 @@ jobs:
             if [[ "${HEALTHY}" == "true" ]]; then
               echo "✅ Status: deployment successful"
               deployed_image="${COPIED_IMAGE}"
-            elif [[ "${DEPLOYMENT_ATTEMPTED}" == "true" && "${ROLLBACK_OUTCOME}" == "success" ]]; then
+            elif [[ "${DEPLOYMENT_ATTEMPTED}" == "true" && "${ROLLBACK_OUTCOME}" == "success" && "${ROLLBACK_READINESS_OUTCOME}" == "success" ]]; then
               echo "⚠️ Status: deployment failed; rollback completed"
               deployed_image="${PREVIOUS_IMAGE}"
             else

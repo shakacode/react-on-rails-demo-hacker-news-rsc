@@ -172,11 +172,14 @@ bundle exec cpflow update-github-actions
 bin/test-cpflow-github-flow bundle exec cpflow
 ```
 
-Do not leave downstream apps pinned to a moving branch such as `main`. For a
-short-lived test of an unreleased upstream PR, pin to a full 40-character commit
-SHA and leave `CPFLOW_VERSION` unset:
+Do not leave downstream apps pinned to a moving branch such as `main`. The pin
+helper resolves normal release tags to their immutable full commit SHA before
+writing workflow refs. For a short-lived test of an unreleased upstream PR, pass
+a full 40-character commit SHA and leave `CPFLOW_VERSION` unset:
 
 ```sh
+bin/pin-cpflow-github-ref v5.2.0
+# or, for an unreleased upstream commit:
 bin/pin-cpflow-github-ref <40-character-control-plane-flow-commit-sha>
 bin/test-cpflow-github-flow ruby /path/to/control-plane-flow/bin/cpflow
 ```
