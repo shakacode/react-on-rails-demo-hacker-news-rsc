@@ -12,6 +12,8 @@ spec:
       image: "{{APP_IMAGE_LINK}}"
       memory: 512Mi
       env:
+        - name: NODE_ENV
+          value: production
         - name: RENDERER_PASSWORD
           value: "cpln://secret/{{APP_SECRETS}}.RENDERER_PASSWORD"
       command: node
