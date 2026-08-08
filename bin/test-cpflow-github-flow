@@ -175,6 +175,27 @@ unless review_app_deploy.fetch("if").include?("github.actor != 'dependabot[bot]'
   abort "review-app deployment must skip Dependabot because Actions does not expose deployment secrets to its PR workflows"
 end
 
+root_dockerfile = File.read("Dockerfile")
+unless root_dockerfile.include?("RENDERER_PASSWORD=NOT_USED_DURING_BUILD ./bin/rails assets:precompile")
+  abort "root production Dockerfile must provide a non-secret renderer password during production asset precompilation"
+end
+unless root_dockerfile.include?("FROM docker.io/library/node:24-bookworm-slim AS node") &&
+       root_dockerfile.include?("corepack pnpm install --frozen-lockfile") &&
+       root_dockerfile.include?("exec corepack pnpm \"$@\"")
+  abort "root production Dockerfile must install Node and locked JavaScript dependencies before production asset precompilation"
+end
+
+kamal_deploy = YAML.load_file("config/deploy.yml", aliases: true)
+kamal_secrets = kamal_deploy.fetch("env").fetch("secret")
+unless kamal_secrets.include?("RENDERER_PASSWORD")
+  abort "Kamal production runtime must inject RENDERER_PASSWORD"
+end
+
+kamal_secret_sources = File.read(".kamal/secrets")
+unless kamal_secret_sources.include?("RENDERER_PASSWORD=$RENDERER_PASSWORD")
+  abort "Kamal renderer password must be sourced from the deploy environment rather than checked into the repository"
+end
+
 summary = steps.find { |step| step["name"] == "Promotion summary" }
 abort "promotion summary step is missing" unless summary
 abort "promotion summary must gate success on workload readiness" unless summary.fetch("run").include?('WORKLOAD_READINESS_OUTCOME') && summary.fetch("run").include?('"${WORKLOAD_READINESS_OUTCOME}" == "success"')
