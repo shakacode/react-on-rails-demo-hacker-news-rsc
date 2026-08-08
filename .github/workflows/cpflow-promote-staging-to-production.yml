@@ -27,10 +27,10 @@ env:
   ROLLBACK_READINESS_INTERVAL: ${{ vars.ROLLBACK_READINESS_INTERVAL || '15' }}
 
 concurrency:
-  # Single global group: only one production promotion may run at a time across the
-  # whole repo. Independent of staging deploys and review-app workflows (different
-  # GVCs / different concurrency keys), so those can still run in parallel.
-  group: cpflow-promote-staging-to-production
+  # Promotion reads staging as its release source, so serialize it with the
+  # staging deploy workflow as well as other promotions. Review apps use
+  # separate GVCs and may still run independently.
+  group: cpflow-staging-and-production
   # Don't cancel an in-flight promotion: a half-finished `cpflow deploy-image` plus a
   # rollback can leave production in a worse state than letting the first run finish.
   cancel-in-progress: false
@@ -456,6 +456,16 @@ jobs:
             exit 1
           fi
 
+          if ! [[ "${ROLLBACK_READINESS_RETRIES}" =~ ^[0-9]+$ ]]; then
+            echo "::error::ROLLBACK_READINESS_RETRIES must be a non-negative integer."
+            exit 1
+          fi
+
+          if ! [[ "${ROLLBACK_READINESS_INTERVAL}" =~ ^[0-9]+$ ]]; then
+            echo "::error::ROLLBACK_READINESS_INTERVAL must be a non-negative integer."
+            exit 1
+          fi
+
           copy_image_retries=$((10#${COPY_IMAGE_RETRIES}))
           copy_image_attempts=$((copy_image_retries + 1))
           copy_image_retry_interval=$((10#${COPY_IMAGE_RETRY_INTERVAL}))
@@ -486,7 +496,7 @@ jobs:
 
           # The workflow-level concurrency group serializes this sequence so two
           # production promotions cannot derive and publish the same next tag.
-          # See the top-level concurrency group: cpflow-promote-staging-to-production.
+          # See the top-level concurrency group: cpflow-staging-and-production.
           latest_number="$(
             cpln image query --org "${CPLN_ORG_PRODUCTION}" --prop "name~${PRODUCTION_APP_NAME}:" --max 0 -o json |
               jq -r --arg prefix "${PRODUCTION_APP_NAME}:" \

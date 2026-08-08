@@ -77,6 +77,10 @@ Staging deploys use the same `CPLN_TOKEN_STAGING` secret plus `STAGING_APP_NAME`
 Before the first staging deploy, bootstrap the persistent staging app once:
 
 ```sh
+if [ -z "${CPLN_ORG_STAGING:-}" ]; then
+  echo "Set CPLN_ORG_STAGING to the staging Control Plane organization." >&2
+  exit 1
+fi
 cpflow setup-app -a "$STAGING_APP_NAME" --org "$CPLN_ORG_STAGING" --skip-post-creation-hook
 ```
 
@@ -134,18 +138,24 @@ production org, using production-only secrets and values.
 
 ## Version Locking
 
-Generated wrappers pin Control Plane Flow with a release tag, for example
-`v5.2.0`. Reusable review-app, staging, cleanup, and
-helper workflows pin the tag in their `uses:` ref. Production promotion pins
-the same tag in the `Checkout control-plane-flow actions` step so the
-caller-owned job can keep `environment: production` and receive production
-environment secrets directly.
+Generated wrappers pin Control Plane Flow to the immutable full commit SHA
+resolved from a release tag. For example, `v5.2.0` currently resolves to
+`1d1ec7f7af181c5c6cf07f512ce336dbdb367246`. Reusable review-app, staging,
+cleanup, and helper workflows use that SHA in their `uses:` ref. Production
+promotion checks out the same SHA so the caller-owned job can keep
+`environment: production` and receive production environment secrets directly.
+
+Verify the release tag's target before updating a pin:
+
+```sh
+git ls-remote https://github.com/shakacode/control-plane-flow.git refs/tags/v5.2.0
+```
 
 Leave `CPFLOW_VERSION` unset so the workflow builds cpflow from the same
 checked-out upstream source. If you set `CPFLOW_VERSION`, it must match the
-release tag your wrappers are pinned to: a `CPFLOW_VERSION=5.2.x` runtime
-override goes with a wrapper pinned to `uses: ...@v5.2.x` (substitute the
-release you pinned above).
+release represented by the immutable SHA your wrappers are pinned to: a
+`CPFLOW_VERSION=5.2.x` runtime override goes with the SHA resolved from the
+corresponding `v5.2.x` tag.
 
 After updating the `cpflow` gem in this repo, update the generated wrappers in
 the same PR:

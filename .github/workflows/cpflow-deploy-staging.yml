@@ -14,6 +14,12 @@ on:
 permissions:
   contents: read
 
+# A promotion reads staging as its release source, so do not allow a staging
+# deployment to change workloads while that release is being captured/copied.
+concurrency:
+  group: cpflow-staging-and-production
+  cancel-in-progress: false
+
 jobs:
   deploy-staging:
     uses: shakacode/control-plane-flow/.github/workflows/cpflow-deploy-staging.yml@1d1ec7f7af181c5c6cf07f512ce336dbdb367246

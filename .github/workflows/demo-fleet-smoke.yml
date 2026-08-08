@@ -40,8 +40,10 @@ jobs:
         bin/rails db:prepare && bin/rails test && bin/rails test:system
       build-command: >-
         RAILS_ENV=production SECRET_KEY_BASE=demo-fleet-smoke-key-not-for-production
+        RENDERER_PASSWORD=demo-fleet-renderer-password
         bin/rails react_on_rails:generate_packs &&
-        RAILS_ENV=production SECRET_KEY_BASE=demo-fleet-smoke-key-not-for-production bin/shakapacker
+        RAILS_ENV=production SECRET_KEY_BASE=demo-fleet-smoke-key-not-for-production
+        RENDERER_PASSWORD=demo-fleet-renderer-password bin/shakapacker
       smoke-command: >-
         export RAILS_ENV=production SECRET_KEY_BASE=demo-fleet-smoke-key-not-for-production
         PGHOST=127.0.0.1 PGPORT=5433

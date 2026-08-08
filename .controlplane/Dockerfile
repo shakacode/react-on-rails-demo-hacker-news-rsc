@@ -16,7 +16,7 @@ WORKDIR /app
 # Native gems such as bigdecimal and pg compile during bundle install. The slim
 # Ruby image deliberately omits the compiler and development headers they need.
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config && \
+    apt-get install --no-install-recommends -y build-essential git libpq-dev libvips42 libyaml-dev pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
 # Keep Node.js available both for asset compilation and for SSR runtimes that
@@ -81,13 +81,12 @@ RUN if [ -f package.json ]; then \
 
 ENV RAILS_ENV=production
 
-# compiling assets requires any value for ENV of SECRET_KEY_BASE
-ENV SECRET_KEY_BASE=NOT_USED_NON_BLANK
+# Compiling assets requires a nonblank SECRET_KEY_BASE, but runtime values must
+# always come from the Control Plane secret declared in templates/app.yml.
+RUN SECRET_KEY_BASE=NOT_USED_NON_BLANK RENDERER_PASSWORD=NOT_USED_DURING_BUILD bin/shakapacker-precompile-hook
 
-RUN RENDERER_PASSWORD=NOT_USED_DURING_BUILD bin/shakapacker-precompile-hook
 
-
-RUN RENDERER_PASSWORD=NOT_USED_DURING_BUILD rails assets:precompile
+RUN SECRET_KEY_BASE=NOT_USED_NON_BLANK RENDERER_PASSWORD=NOT_USED_DURING_BUILD rails assets:precompile
 
 # add entrypoint
 COPY .controlplane/entrypoint.sh ./
