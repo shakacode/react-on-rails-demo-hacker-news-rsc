@@ -14,6 +14,10 @@ spec:
       env:
         - name: NODE_ENV
           value: production
+        # This workload deliberately does not inherit the app GVC environment,
+        # so preserve the public bind address Rails needs over internal DNS.
+        - name: RENDERER_HOST
+          value: "0.0.0.0"
         - name: RENDERER_PASSWORD
           value: "cpln://secret/{{APP_SECRETS}}.RENDERER_PASSWORD"
       command: node

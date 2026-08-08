@@ -154,3 +154,34 @@ actionlint \
   -ignore "SC2129" \
   -ignore 'property "workflow_(ref|sha|repository|file_path)" is not defined in object type' \
   .github/workflows/cpflow-*.yml
+
+echo "==> check promotion safety wiring"
+ruby <<'RUBY'
+require "yaml"
+
+promotion_path = ".github/workflows/cpflow-promote-staging-to-production.yml"
+promotion = YAML.load_file(promotion_path, aliases: true)
+promotion_job = promotion.fetch("jobs").fetch("promote-to-production")
+steps = promotion_job.fetch("steps")
+
+renderer = YAML.load_file(".controlplane/templates/node-renderer.yml", aliases: true)
+renderer_env = renderer.fetch("spec").fetch("containers").first.fetch("env")
+renderer_host = renderer_env.find { |entry| entry["name"] == "RENDERER_HOST" }
+abort "node renderer must explicitly bind RENDERER_HOST when inheritEnv is false" unless renderer_host&.fetch("value") == "0.0.0.0"
+
+summary = steps.find { |step| step["name"] == "Promotion summary" }
+abort "promotion summary step is missing" unless summary
+abort "promotion summary must gate success on workload readiness" unless summary.fetch("run").include?('WORKLOAD_READINESS_OUTCOME') && summary.fetch("run").include?('"${WORKLOAD_READINESS_OUTCOME}" == "success"')
+
+copy = steps.find { |step| step["id"] == "copy-image" }
+abort "copy image step is missing" unless copy
+abort "copy image must expose the promoted source commit" unless copy.fetch("run").include?('echo "source_commit=${staging_commit}" >> "$GITHUB_OUTPUT"')
+abort "promotion job must expose the promoted source commit" unless promotion_job.fetch("outputs").fetch("source_commit") == "${{ steps.copy-image.outputs.source_commit }}"
+
+release_job = promotion.fetch("jobs").fetch("create-github-release")
+release_step = release_job.fetch("steps").find { |step| step["name"] == "Create GitHub release" }
+abort "release step is missing" unless release_step
+abort "release must receive the promoted source commit" unless release_step.fetch("env").fetch("SOURCE_COMMIT") == "${{ needs.promote-to-production.outputs.source_commit }}"
+abort "release must resolve the promoted source commit" unless release_step.fetch("run").include?('repos/${GH_REPO}/commits/${SOURCE_COMMIT}')
+abort "release must target the promoted source commit" unless release_step.fetch("run").include?('--target "${release_target}"')
+RUBY
