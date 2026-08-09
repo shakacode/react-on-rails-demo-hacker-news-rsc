@@ -192,7 +192,7 @@ unless kamal_secrets.include?("RENDERER_PASSWORD")
 end
 
 kamal_secret_sources = File.read(".kamal/secrets")
-unless kamal_secret_sources.include?("RENDERER_PASSWORD=$RENDERER_PASSWORD")
+unless kamal_secret_sources.match?(/^\s*RENDERER_PASSWORD=\$RENDERER_PASSWORD\s*(?:#.*)?$/)
   abort "Kamal renderer password must be sourced from the deploy environment rather than checked into the repository"
 end
 
