@@ -1,0 +1,44 @@
+# Internal React on Rails Pro renderer used by Rails for SSR and RSC responses.
+kind: workload
+name: node-renderer
+spec:
+  type: standard
+  containers:
+    - name: node-renderer
+      cpu: 300m
+      # Keep the renderer isolated from Rails and database credentials; it only
+      # needs the shared renderer password to authenticate internal requests.
+      inheritEnv: false
+      image: "{{APP_IMAGE_LINK}}"
+      memory: 512Mi
+      env:
+        - name: NODE_ENV
+          value: production
+        # This workload deliberately does not inherit the app GVC environment,
+        # so preserve the public bind address Rails needs over internal DNS.
+        - name: RENDERER_HOST
+          value: "0.0.0.0"
+        - name: RENDERER_PASSWORD
+          value: "cpln://secret/{{APP_SECRETS}}.RENDERER_PASSWORD"
+      command: node
+      args:
+        - client/node-renderer.js
+      ports:
+        - number: 3800
+          protocol: tcp
+  defaultOptions:
+    autoscaling:
+      minScale: 1
+      maxScale: 1
+      metric: disabled
+    capacityAI: true
+  firewallConfig:
+    internal:
+      inboundAllowType: same-gvc
+    external:
+      inboundAllowCIDR: []
+      # Server-rendered Hacker News pages fetch the public Firebase API, so
+      # renderer egress cannot be restricted to internal Control Plane traffic.
+      outboundAllowCIDR:
+        - 0.0.0.0/0
+  identityLink: "{{APP_IDENTITY_LINK}}"

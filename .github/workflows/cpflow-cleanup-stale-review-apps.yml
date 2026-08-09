@@ -1,0 +1,17 @@
+name: Cleanup Stale Review Apps
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    # Cleanup targets the current inferred review-app prefix. If you changed
+    # naming conventions, manually delete review apps under the old prefix.
+    uses: shakacode/control-plane-flow/.github/workflows/cpflow-cleanup-stale-review-apps.yml@1d1ec7f7af181c5c6cf07f512ce336dbdb367246
+    secrets:
+      CPLN_TOKEN_STAGING: ${{ secrets.CPLN_TOKEN_STAGING }}

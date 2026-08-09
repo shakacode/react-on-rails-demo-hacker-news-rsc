@@ -1,0 +1,214 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+cpflow_cmd=(cpflow)
+if [[ $# -gt 0 ]]; then
+  cpflow_cmd=("$@")
+fi
+
+echo "==> cpflow github-flow-readiness"
+"${cpflow_cmd[@]}" github-flow-readiness
+
+echo "==> parse generated GitHub Actions YAML"
+ruby <<'RUBY'
+require "yaml"
+
+Dir[".github/actions/**/action.yml", ".github/workflows/*.yml"].sort.each do |path|
+  YAML.load_file(path, aliases: true)
+  puts "parsed #{path}"
+end
+RUBY
+
+echo "==> check composite action input descriptions"
+ruby <<'RUBY'
+require "yaml"
+
+bad = []
+Dir[".github/actions/**/action.yml"].sort.each do |path|
+  doc = YAML.load_file(path, aliases: true)
+  doc.fetch("inputs", {}).each do |name, spec|
+    bad << "#{path}:#{name}" if spec["description"].to_s.include?("${{")
+  end
+end
+
+abort bad.join("\n") unless bad.empty?
+puts "no action metadata descriptions contain GitHub expressions"
+RUBY
+
+echo "==> check cpflow reusable workflow refs"
+ruby <<'RUBY'
+require "yaml"
+
+CONTROL_PLANE_FLOW_WORKFLOW = %r{\Ashakacode/control-plane-flow/\.github/workflows/[^@\s]+@([^\s]+)\z}
+PROMOTE_WORKFLOW = %r{\Ashakacode/control-plane-flow/\.github/workflows/cpflow-promote-staging-to-production\.yml@([^\s]+)\z}
+EXPECTED_PROMOTE_WORKFLOW_REF_FORMAT = "shakacode/control-plane-flow/.github/workflows/cpflow-promote-staging-to-production.yml@vX.Y.Z"
+EXPECTED_CPFLOW_CHECKOUT_ACTION = "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+EXPECTED_CPFLOW_CHECKOUT_REPOSITORY = "shakacode/control-plane-flow"
+
+refs = Hash.new { |hash, key| hash[key] = [] }
+
+Dir[".github/workflows/cpflow-*.yml"].sort.each do |path|
+  doc = YAML.load_file(path, aliases: true)
+  doc.fetch("jobs", {}).each do |job_name, job|
+    next unless job.is_a?(Hash)
+
+    with = job["with"].is_a?(Hash) ? job["with"] : {}
+    input_ref = with["control_plane_flow_ref"]
+    uses_match = job["uses"].to_s.match(CONTROL_PLANE_FLOW_WORKFLOW)
+
+    if job["secrets"] == "inherit"
+      abort "#{path}:#{job_name} uses secrets: inherit; pass only the named secrets the upstream workflow needs"
+    end
+
+    if input_ref
+      abort "#{path}:#{job_name} passes obsolete control_plane_flow_ref. Remove it; the upstream reusable workflow checks out its own source from GitHub's job.workflow_* context."
+    end
+
+    unless uses_match
+      next
+    end
+
+    uses_ref = uses_match[1]
+    refs[uses_ref] << "#{path}:#{job_name}"
+
+    if job["uses"].to_s.match?(PROMOTE_WORKFLOW)
+      abort "#{path}:#{job_name} must not call the cross-repo production reusable workflow; use a normal caller-repo job with environment: production"
+    end
+
+  end
+end
+
+promote_path = ".github/workflows/cpflow-promote-staging-to-production.yml"
+promote_doc = YAML.load_file(promote_path, aliases: true)
+promote_job = promote_doc.fetch("jobs", {})["promote-to-production"]
+
+unless promote_job
+  abort "#{promote_path}:promote-to-production job is missing"
+end
+
+if promote_job.key?("uses")
+  abort "#{promote_path}:promote-to-production must run as a normal caller-repo job, not a reusable workflow, so GitHub can expose production environment secrets"
+end
+
+unless promote_job["environment"].to_s == "production"
+  abort "#{promote_path}:promote-to-production must declare environment: production"
+end
+
+checkout_step = Array(promote_job["steps"]).find { |step| step["name"] == "Checkout control-plane-flow actions" }
+
+unless checkout_step
+  abort "#{promote_path}:promote-to-production must include a Checkout control-plane-flow actions step"
+end
+
+unless checkout_step["uses"] == EXPECTED_CPFLOW_CHECKOUT_ACTION
+  abort "#{promote_path}:promote-to-production must use #{EXPECTED_CPFLOW_CHECKOUT_ACTION} for the Checkout control-plane-flow actions step"
+end
+
+checkout_with = checkout_step.fetch("with", {})
+checkout_repository = checkout_with["repository"]
+checkout_ref = checkout_with["ref"]
+
+unless checkout_repository == EXPECTED_CPFLOW_CHECKOUT_REPOSITORY
+  abort "#{promote_path}:promote-to-production must check out #{EXPECTED_CPFLOW_CHECKOUT_REPOSITORY}"
+end
+
+if checkout_ref.to_s.strip.empty?
+  abort "#{promote_path}:promote-to-production must pin the Checkout control-plane-flow actions step"
+end
+
+refs[checkout_ref] << "#{promote_path}:promote-to-production"
+
+setup_step = Array(promote_job["steps"]).find { |step| step["name"] == "Setup production environment" }
+
+unless setup_step
+  abort "#{promote_path}:promote-to-production must include a Setup production environment step"
+end
+
+setup_ref = setup_step.fetch("with", {})["control_plane_flow_ref"]
+setup_match = setup_ref.to_s.match(PROMOTE_WORKFLOW)
+
+unless setup_match
+  abort "#{promote_path}:promote-to-production must pass a pinned production control_plane_flow_ref to setup, " \
+        "for example #{EXPECTED_PROMOTE_WORKFLOW_REF_FORMAT}"
+end
+
+refs[setup_match[1]] << "#{promote_path}:promote-to-production setup"
+
+if refs.empty?
+  puts "no upstream cpflow reusable workflow refs found"
+elsif refs.length > 1
+  refs.each do |ref, paths|
+    puts "#{ref}: #{paths.uniq.sort.join(', ')}"
+  end
+  abort "cpflow workflow wrappers use multiple upstream refs: #{refs.keys.sort.join(', ')}"
+else
+  puts "cpflow refs: #{refs.keys.sort.join(', ')}"
+end
+RUBY
+
+echo "==> actionlint"
+actionlint \
+  -ignore "SC2129" \
+  -ignore 'property "workflow_(ref|sha|repository|file_path)" is not defined in object type' \
+  .github/workflows/cpflow-*.yml
+
+echo "==> check promotion safety wiring"
+ruby <<'RUBY'
+require "yaml"
+
+promotion_path = ".github/workflows/cpflow-promote-staging-to-production.yml"
+promotion = YAML.load_file(promotion_path, aliases: true)
+promotion_job = promotion.fetch("jobs").fetch("promote-to-production")
+steps = promotion_job.fetch("steps")
+
+renderer = YAML.load_file(".controlplane/templates/node-renderer.yml", aliases: true)
+renderer_env = renderer.fetch("spec").fetch("containers").first.fetch("env")
+renderer_host = renderer_env.find { |entry| entry["name"] == "RENDERER_HOST" }
+abort "node renderer must explicitly bind RENDERER_HOST when inheritEnv is false" unless renderer_host&.fetch("value") == "0.0.0.0"
+
+review_app = YAML.load_file(".github/workflows/cpflow-deploy-review-app.yml", aliases: true)
+review_app_deploy = review_app.fetch("jobs").fetch("deploy")
+unless review_app_deploy.fetch("if").include?("github.actor != 'dependabot[bot]'")
+  abort "review-app deployment must skip Dependabot because Actions does not expose deployment secrets to its PR workflows"
+end
+
+root_dockerfile = File.read("Dockerfile")
+unless root_dockerfile.include?("RENDERER_PASSWORD=NOT_USED_DURING_BUILD ./bin/rails assets:precompile")
+  abort "root production Dockerfile must provide a non-secret renderer password during production asset precompilation"
+end
+unless root_dockerfile.include?("FROM docker.io/library/node:24-bookworm-slim AS node") &&
+       root_dockerfile.include?("corepack pnpm install --frozen-lockfile") &&
+       root_dockerfile.include?("exec corepack pnpm \"$@\"")
+  abort "root production Dockerfile must install Node and locked JavaScript dependencies before production asset precompilation"
+end
+
+kamal_deploy = YAML.load_file("config/deploy.yml", aliases: true)
+kamal_secrets = kamal_deploy.fetch("env").fetch("secret")
+unless kamal_secrets.include?("RENDERER_PASSWORD")
+  abort "Kamal production runtime must inject RENDERER_PASSWORD"
+end
+
+kamal_secret_sources = File.read(".kamal/secrets")
+unless kamal_secret_sources.match?(/^\s*RENDERER_PASSWORD=\$RENDERER_PASSWORD\s*(?:#.*)?$/)
+  abort "Kamal renderer password must be sourced from the deploy environment rather than checked into the repository"
+end
+
+summary = steps.find { |step| step["name"] == "Promotion summary" }
+abort "promotion summary step is missing" unless summary
+abort "promotion summary must gate success on workload readiness" unless summary.fetch("run").include?('WORKLOAD_READINESS_OUTCOME') && summary.fetch("run").include?('"${WORKLOAD_READINESS_OUTCOME}" == "success"')
+
+copy = steps.find { |step| step["id"] == "copy-image" }
+abort "copy image step is missing" unless copy
+abort "copy image must expose the promoted source commit" unless copy.fetch("run").include?('echo "source_commit=${staging_commit}" >> "$GITHUB_OUTPUT"')
+abort "promotion job must expose the promoted source commit" unless promotion_job.fetch("outputs").fetch("source_commit") == "${{ steps.copy-image.outputs.source_commit }}"
+
+release_job = promotion.fetch("jobs").fetch("create-github-release")
+release_step = release_job.fetch("steps").find { |step| step["name"] == "Create GitHub release" }
+abort "release step is missing" unless release_step
+abort "release must receive the promoted source commit" unless release_step.fetch("env").fetch("SOURCE_COMMIT") == "${{ needs.promote-to-production.outputs.source_commit }}"
+abort "release must resolve the promoted source commit" unless release_step.fetch("run").include?('repos/${GH_REPO}/commits/${SOURCE_COMMIT}')
+abort "release must target the promoted source commit" unless release_step.fetch("run").include?('--target "${release_target}"')
+RUBY

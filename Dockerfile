@@ -3,13 +3,14 @@
 
 # This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
 # docker build -t react-on-rails-hacker-news-app .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name react-on-rails-hacker-news-app react-on-rails-hacker-news-app
+# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> -e RENDERER_PASSWORD=<shared-renderer-password> --name react-on-rails-hacker-news-app react-on-rails-hacker-news-app
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.4.3
-FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
+FROM docker.io/library/node:24-bookworm-slim AS node
+FROM docker.io/library/ruby:$RUBY_VERSION-slim-bookworm AS base
 
 # Rails app lives here
 WORKDIR /rails
@@ -19,6 +20,20 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Keep Node.js available for asset compilation and the production renderer.
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
+COPY --from=node /usr/local/include/node /usr/local/include/node
+RUN ln -sf ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
+    ln -sf ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx && \
+    ln -sf ../lib/node_modules/corepack/dist/corepack.js /usr/local/bin/corepack && \
+    chmod +x /usr/local/lib/node_modules/npm/bin/npm-cli.js \
+             /usr/local/lib/node_modules/npm/bin/npx-cli.js \
+             /usr/local/lib/node_modules/corepack/dist/corepack.js && \
+    node --version && npm --version && corepack --version
+RUN printf '%s\n' '#!/bin/sh' 'exec corepack pnpm "$@"' > /usr/local/bin/pnpm && \
+    chmod +x /usr/local/bin/pnpm
 
 # Set production environment variables and enable jemalloc for reduced memory usage and latency.
 ENV RAILS_ENV="production" \
@@ -38,11 +53,15 @@ RUN apt-get update -qq && \
 # Install application gems
 COPY vendor/* ./vendor/
 COPY Gemfile Gemfile.lock ./
+COPY package.json pnpm-lock.yaml ./
 
 RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
     bundle exec bootsnap precompile -j 1 --gemfile
+
+RUN corepack prepare "$(node -p "require('./package.json').packageManager")" --activate && \
+    corepack pnpm install --frozen-lockfile
 
 # Copy application code
 COPY . .
@@ -51,8 +70,9 @@ COPY . .
 # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
 RUN bundle exec bootsnap precompile -j 1 app/ lib/
 
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+# Precompiling assets requires nonblank Rails and renderer secrets, but the
+# runtime renderer password is injected by Kamal rather than baked into the image.
+RUN SECRET_KEY_BASE_DUMMY=1 RENDERER_PASSWORD=NOT_USED_DURING_BUILD ./bin/rails assets:precompile
 
 
 

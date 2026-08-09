@@ -1,0 +1,31 @@
+# Template setup of the GVC, roughly corresponding to a Heroku app
+kind: gvc
+name: "{{APP_NAME}}"
+spec:
+  env:
+    - name: DATABASE_URL
+      value: "cpln://secret/{{APP_NAME}}-pg.database_url"
+    - name: CACHE_DATABASE_URL
+      value: "cpln://secret/{{APP_NAME}}-pg.cache_database_url"
+    - name: QUEUE_DATABASE_URL
+      value: "cpln://secret/{{APP_NAME}}-pg.queue_database_url"
+    - name: CABLE_DATABASE_URL
+      value: "cpln://secret/{{APP_NAME}}-pg.cable_database_url"
+    - name: RAILS_ENV
+      value: production
+    - name: RAILS_LOG_TO_STDOUT
+      value: "true"
+    - name: RAILS_SERVE_STATIC_FILES
+      value: "true"
+    # The Rails workload reaches the renderer through Control Plane's internal DNS.
+    - name: REACT_RENDERER_URL
+      value: "http://node-renderer.{{APP_NAME}}.cpln.local:3800"
+    - name: RENDERER_HOST
+      value: "0.0.0.0"
+    - name: RENDERER_PASSWORD
+      value: "cpln://secret/{{APP_SECRETS}}.RENDERER_PASSWORD"
+    - name: SECRET_KEY_BASE
+      value: "cpln://secret/{{APP_SECRETS}}.SECRET_KEY_BASE"
+  staticPlacement:
+    locationLinks:
+      - "{{APP_LOCATION_LINK}}"

@@ -7,7 +7,15 @@ ReactOnRailsPro.configure do |config|
   config.renderer_url = ENV.fetch("REACT_RENDERER_URL", "http://localhost:3800")
 
   # See value in client/node-renderer.js
-  config.renderer_password = ENV.fetch("RENDERER_PASSWORD", "devPassword")
+  config.renderer_password = if ENV["RENDERER_PASSWORD"].to_s.strip.empty?
+    if Rails.env.development? || Rails.env.test?
+      "devPassword"
+    else
+      raise "RENDERER_PASSWORD must be set outside development/test"
+    end
+  else
+    ENV.fetch("RENDERER_PASSWORD")
+  end
 
   config.ssr_timeout = 5
   config.renderer_request_retry_limit = 1
