@@ -11,6 +11,7 @@ A single trailing newline from GitHub's comment editor is accepted.
 
 | Command | What it does |
 | --- | --- |
+| `+review-app-deploy` | Creates or redeploys the review app for a trusted same-repository PR. |
 | `+review-app-delete` | Deletes the review app. This also runs automatically when the PR closes. |
 | `+review-app-help` | Posts this help message on the PR. |
 
@@ -92,9 +93,11 @@ template updates on an existing persistent app, use `cpflow apply-template`
 with the same template list and make sure the app identity has `reveal`
 permission on the app secret policy.
 
-Review apps are temporary and deploy automatically for trusted same-repository
-pull-request heads. Use the workflow-dispatch input to redeploy an internal PR
-when needed; fork heads are never built with repository secrets. Staging and
+Review apps are temporary. Create the first app for a trusted same-repository
+PR with `+review-app-deploy` or a manual run of the Deploy Review App workflow
+with its `pr_number` input. Later pull-request events refresh an existing app;
+they do not create one. Use the same comment or manual workflow to redeploy
+when needed. Fork heads are never built with repository secrets. Staging and
 production are persistent apps and should be bootstrapped explicitly.
 
 Production promotion is part of the generated flow, but keep it protected:
