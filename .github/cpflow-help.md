@@ -154,11 +154,11 @@ Verify the release tag's target before updating a pin:
 git ls-remote https://github.com/shakacode/control-plane-flow.git refs/tags/v5.3.0
 ```
 
-Leave `CPFLOW_VERSION` unset so the workflow builds cpflow from the same
-checked-out upstream source. If you set `CPFLOW_VERSION`, it must match the
-release represented by the immutable SHA your wrappers are pinned to: a
-`CPFLOW_VERSION=5.3.x` runtime override goes with the SHA resolved from the
-corresponding `v5.3.x` tag.
+Leave `CPFLOW_VERSION` unset with this repo's immutable SHA pins so the
+workflow builds cpflow from the same checked-out upstream source. Runtime
+overrides are supported only when the workflow ref is a release tag matching
+the exact version, such as `CPFLOW_VERSION=5.3.0` with `@v5.3.0`. A SHA ref
+does not support an override, even when that SHA resolves from a release tag.
 
 After updating the `cpflow` gem in this repo, update the generated wrappers in
 the same PR:
