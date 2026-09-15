@@ -313,21 +313,21 @@ GEM
       prism (>= 1.6.0)
       rbs (>= 4.0.0)
       tsort
-    react_on_rails (17.1.0.rc.3)
+    react_on_rails (17.1.0.rc.5)
       addressable
       connection_pool
       execjs (~> 2.5)
       rails (>= 5.2)
       rainbow (~> 3.0)
       shakapacker (>= 6.0)
-    react_on_rails_pro (17.1.0.rc.3)
+    react_on_rails_pro (17.1.0.rc.5)
       async (>= 2.29)
       async-http (~> 0.95)
       execjs (~> 2.9)
       io-endpoint (~> 0.17.0)
       jwt (>= 2.5, < 4)
       nokogiri (>= 1.12, < 2)
-      react_on_rails (= 17.1.0.rc.3)
+      react_on_rails (= 17.1.0.rc.5)
     regexp_parser (2.11.3)
     reline (0.7.0)
       io-console (~> 0.5)
@@ -455,8 +455,8 @@ DEPENDENCIES
   propshaft
   puma (>= 5.0)
   rails (~> 8.1.2)
-  react_on_rails (= 17.1.0.rc.3)
-  react_on_rails_pro (= 17.1.0.rc.3)
+  react_on_rails (= 17.1.0.rc.5)
+  react_on_rails_pro (= 17.1.0.rc.5)
   rubocop-rails-omakase
   ruby-vips (~> 2.2)
   selenium-webdriver
@@ -594,8 +594,8 @@ CHECKSUMS
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
   rbs (4.2.0) sha256=51f7b886dcc05bc09e10b901daa6a81829f6adc03101d6ca9ea4aac6103e0674
   rdoc (8.0.0) sha256=03bf8c08a9639658855a0cfd77c0abca8325c227693f7f33f82957811348c469
-  react_on_rails (17.1.0.rc.3) sha256=ec1d3bfff9cfb3b0075a26577b7a198781fd015e18f1806908da5551dfaccfc8
-  react_on_rails_pro (17.1.0.rc.3) sha256=051dc65f8b914b3f9e420e4a5ddab180a5719fdeba783f2a6e0b796596ca29d6
+  react_on_rails (17.1.0.rc.5) sha256=742f78dc213b740b5da54edc0d1bc7eed21aa4b9193c773defce02bcbe29dff5
+  react_on_rails_pro (17.1.0.rc.5) sha256=d80fe41ffd46a0cf637bf64a6cc8e042d3a00d5cf71c50125677f6ebbfd89d23
   regexp_parser (2.11.3) sha256=ca13f381a173b7a93450e53459075c9b76a10433caadcb2f1180f2c741fc55a4
   reline (0.7.0) sha256=5b012d8e55dbf9d450f12bde2cf7d15ff546ae80b3f8f3b30e570d431815583d
   rexml (3.4.4) sha256=19e0a2c3425dfbf2d4fc1189747bdb2f849b6c5e74180401b15734bc97b5d142

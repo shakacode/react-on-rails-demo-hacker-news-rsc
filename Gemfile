@@ -61,7 +61,7 @@ group :test do
   gem "webrick"
 end
 
-gem "react_on_rails", "= 17.1.0.rc.3"
-gem "react_on_rails_pro", "= 17.1.0.rc.3"
+gem "react_on_rails", "= 17.1.0.rc.5"
+gem "react_on_rails_pro", "= 17.1.0.rc.5"
 
 gem "shakapacker", "= 10.2.0"
