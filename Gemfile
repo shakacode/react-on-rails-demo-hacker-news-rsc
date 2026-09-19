@@ -61,8 +61,8 @@ group :test do
   gem "webrick"
 end
 
-gem "react_on_rails", "= 17.1.0.rc.5"
-gem "react_on_rails_pro", "= 17.1.0.rc.5"
+gem "react_on_rails", "= 17.1.0"
+gem "react_on_rails_pro", "= 17.1.0"
 
 gem "shakapacker", "= 10.2.0"
 # Keep the webpack dev-server proxy compatible with Shakapacker 10.2.0.
