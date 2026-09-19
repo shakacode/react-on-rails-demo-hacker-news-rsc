@@ -16,10 +16,70 @@ echo "==> parse generated GitHub Actions YAML"
 ruby <<'RUBY'
 require "yaml"
 
-Dir[".github/actions/**/action.yml", ".github/workflows/*.yml"].sort.each do |path|
-  YAML.load_file(path, aliases: true)
+documents = Dir[
+  ".github/actions/**/action.yml",
+  ".github/actions/**/action.yaml",
+  ".github/workflows/*.yml",
+  ".github/workflows/*.yaml"
+].sort.to_h do |path|
+  [path, YAML.load_file(path, aliases: true)]
+end
+
+documents.each_key do |path|
   puts "parsed #{path}"
 end
+
+generated_local_action_pattern = %r{\A\./(?<directory>\.github/actions/cpflow-[a-z0-9]+(?:-[a-z0-9]+)*)\z}
+local_action_references = []
+invalid_local_action_references = []
+visited_container_ids = {}
+walk = lambda do |node, source_path|
+  if node.is_a?(Hash) || node.is_a?(Array)
+    next if visited_container_ids.key?(node.object_id)
+
+    visited_container_ids[node.object_id] = true
+  end
+
+  case node
+  when Hash
+    uses = node["uses"]
+    if uses.is_a?(String) && uses.start_with?("./.github/actions/cpflow-")
+      match = uses.match(generated_local_action_pattern)
+      if match
+        local_action_references << [source_path, match[:directory]]
+      else
+        invalid_local_action_references <<
+          "#{source_path} has invalid generated local action reference #{uses}"
+      end
+    end
+    node.each_value { |value| walk.call(value, source_path) }
+  when Array
+    node.each { |value| walk.call(value, source_path) }
+  end
+end
+documents.each { |path, document| walk.call(document, path) }
+
+abort invalid_local_action_references.uniq.join("\n") unless invalid_local_action_references.empty?
+
+missing_actions = local_action_references.uniq.filter_map do |source_path, action_directory|
+  directory_is_local = begin
+    File.lstat(action_directory).directory?
+  rescue Errno::ENOENT
+    false
+  end
+  descriptor_is_local = %w[action.yml action.yaml].any? do |filename|
+    begin
+      File.lstat(File.join(action_directory, filename)).file?
+    rescue Errno::ENOENT
+      false
+    end
+  end
+
+  "#{source_path} references missing local action #{action_directory}" unless directory_is_local && descriptor_is_local
+end
+
+abort missing_actions.join("\n") unless missing_actions.empty?
+puts "all referenced local actions have checked-in descriptors"
 RUBY
 
 echo "==> check composite action input descriptions"
@@ -45,7 +105,7 @@ require "yaml"
 CONTROL_PLANE_FLOW_WORKFLOW = %r{\Ashakacode/control-plane-flow/\.github/workflows/[^@\s]+@([^\s]+)\z}
 PROMOTE_WORKFLOW = %r{\Ashakacode/control-plane-flow/\.github/workflows/cpflow-promote-staging-to-production\.yml@([^\s]+)\z}
 EXPECTED_PROMOTE_WORKFLOW_REF_FORMAT = "shakacode/control-plane-flow/.github/workflows/cpflow-promote-staging-to-production.yml@vX.Y.Z"
-EXPECTED_CPFLOW_CHECKOUT_ACTION = "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+EXPECTED_CPFLOW_CHECKOUT_ACTION = "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1"
 EXPECTED_CPFLOW_CHECKOUT_REPOSITORY = "shakacode/control-plane-flow"
 
 refs = Hash.new { |hash, key| hash[key] = [] }
@@ -82,60 +142,62 @@ Dir[".github/workflows/cpflow-*.yml"].sort.each do |path|
 end
 
 promote_path = ".github/workflows/cpflow-promote-staging-to-production.yml"
-promote_doc = YAML.load_file(promote_path, aliases: true)
-promote_job = promote_doc.fetch("jobs", {})["promote-to-production"]
+if File.exist?(promote_path)
+  promote_doc = YAML.load_file(promote_path, aliases: true)
+  promote_job = promote_doc.fetch("jobs", {})["promote-to-production"]
 
-unless promote_job
-  abort "#{promote_path}:promote-to-production job is missing"
+  unless promote_job
+    abort "#{promote_path}:promote-to-production job is missing"
+  end
+
+  if promote_job.key?("uses")
+    abort "#{promote_path}:promote-to-production must run as a normal caller-repo job, not a reusable workflow, so GitHub can expose production environment secrets"
+  end
+
+  unless promote_job["environment"].to_s == "production"
+    abort "#{promote_path}:promote-to-production must declare environment: production"
+  end
+
+  checkout_step = Array(promote_job["steps"]).find { |step| step["name"] == "Checkout control-plane-flow actions" }
+
+  unless checkout_step
+    abort "#{promote_path}:promote-to-production must include a Checkout control-plane-flow actions step"
+  end
+
+  unless checkout_step["uses"] == EXPECTED_CPFLOW_CHECKOUT_ACTION
+    abort "#{promote_path}:promote-to-production must use #{EXPECTED_CPFLOW_CHECKOUT_ACTION} for the Checkout control-plane-flow actions step"
+  end
+
+  checkout_with = checkout_step.fetch("with", {})
+  checkout_repository = checkout_with["repository"]
+  checkout_ref = checkout_with["ref"]
+
+  unless checkout_repository == EXPECTED_CPFLOW_CHECKOUT_REPOSITORY
+    abort "#{promote_path}:promote-to-production must check out #{EXPECTED_CPFLOW_CHECKOUT_REPOSITORY}"
+  end
+
+  if checkout_ref.to_s.strip.empty?
+    abort "#{promote_path}:promote-to-production must pin the Checkout control-plane-flow actions step"
+  end
+
+  refs[checkout_ref] << "#{promote_path}:promote-to-production"
+
+  setup_step = Array(promote_job["steps"]).find { |step| step["name"] == "Setup production environment" }
+
+  unless setup_step
+    abort "#{promote_path}:promote-to-production must include a Setup production environment step"
+  end
+
+  setup_ref = setup_step.fetch("with", {})["control_plane_flow_ref"]
+  setup_match = setup_ref.to_s.match(PROMOTE_WORKFLOW)
+
+  unless setup_match
+    abort "#{promote_path}:promote-to-production must pass a pinned production control_plane_flow_ref to setup, " \
+          "for example #{EXPECTED_PROMOTE_WORKFLOW_REF_FORMAT}"
+  end
+
+  refs[setup_match[1]] << "#{promote_path}:promote-to-production setup"
 end
-
-if promote_job.key?("uses")
-  abort "#{promote_path}:promote-to-production must run as a normal caller-repo job, not a reusable workflow, so GitHub can expose production environment secrets"
-end
-
-unless promote_job["environment"].to_s == "production"
-  abort "#{promote_path}:promote-to-production must declare environment: production"
-end
-
-checkout_step = Array(promote_job["steps"]).find { |step| step["name"] == "Checkout control-plane-flow actions" }
-
-unless checkout_step
-  abort "#{promote_path}:promote-to-production must include a Checkout control-plane-flow actions step"
-end
-
-unless checkout_step["uses"] == EXPECTED_CPFLOW_CHECKOUT_ACTION
-  abort "#{promote_path}:promote-to-production must use #{EXPECTED_CPFLOW_CHECKOUT_ACTION} for the Checkout control-plane-flow actions step"
-end
-
-checkout_with = checkout_step.fetch("with", {})
-checkout_repository = checkout_with["repository"]
-checkout_ref = checkout_with["ref"]
-
-unless checkout_repository == EXPECTED_CPFLOW_CHECKOUT_REPOSITORY
-  abort "#{promote_path}:promote-to-production must check out #{EXPECTED_CPFLOW_CHECKOUT_REPOSITORY}"
-end
-
-if checkout_ref.to_s.strip.empty?
-  abort "#{promote_path}:promote-to-production must pin the Checkout control-plane-flow actions step"
-end
-
-refs[checkout_ref] << "#{promote_path}:promote-to-production"
-
-setup_step = Array(promote_job["steps"]).find { |step| step["name"] == "Setup production environment" }
-
-unless setup_step
-  abort "#{promote_path}:promote-to-production must include a Setup production environment step"
-end
-
-setup_ref = setup_step.fetch("with", {})["control_plane_flow_ref"]
-setup_match = setup_ref.to_s.match(PROMOTE_WORKFLOW)
-
-unless setup_match
-  abort "#{promote_path}:promote-to-production must pass a pinned production control_plane_flow_ref to setup, " \
-        "for example #{EXPECTED_PROMOTE_WORKFLOW_REF_FORMAT}"
-end
-
-refs[setup_match[1]] << "#{promote_path}:promote-to-production setup"
 
 if refs.empty?
   puts "no upstream cpflow reusable workflow refs found"
@@ -150,65 +212,21 @@ end
 RUBY
 
 echo "==> actionlint"
-actionlint \
-  -ignore "SC2129" \
-  -ignore 'property "workflow_(ref|sha|repository|file_path)" is not defined in object type' \
-  .github/workflows/cpflow-*.yml
+shopt -s nullglob
+cpflow_workflows=(.github/workflows/cpflow-*.yml)
+if [[ ${#cpflow_workflows[@]} -gt 0 ]]; then
+  actionlint \
+    -ignore "SC2129" \
+    -ignore 'property "workflow_(ref|sha|repository|file_path)" is not defined in object type' \
+    "${cpflow_workflows[@]}"
+fi
 
-echo "==> check promotion safety wiring"
-ruby <<'RUBY'
-require "yaml"
-
-promotion_path = ".github/workflows/cpflow-promote-staging-to-production.yml"
-promotion = YAML.load_file(promotion_path, aliases: true)
-promotion_job = promotion.fetch("jobs").fetch("promote-to-production")
-steps = promotion_job.fetch("steps")
-
-renderer = YAML.load_file(".controlplane/templates/node-renderer.yml", aliases: true)
-renderer_env = renderer.fetch("spec").fetch("containers").first.fetch("env")
-renderer_host = renderer_env.find { |entry| entry["name"] == "RENDERER_HOST" }
-abort "node renderer must explicitly bind RENDERER_HOST when inheritEnv is false" unless renderer_host&.fetch("value") == "0.0.0.0"
-
-review_app = YAML.load_file(".github/workflows/cpflow-deploy-review-app.yml", aliases: true)
-review_app_deploy = review_app.fetch("jobs").fetch("deploy")
-unless review_app_deploy.fetch("if").include?("github.actor != 'dependabot[bot]'")
-  abort "review-app deployment must skip Dependabot because Actions does not expose deployment secrets to its PR workflows"
-end
-
-root_dockerfile = File.read("Dockerfile")
-unless root_dockerfile.include?("RENDERER_PASSWORD=NOT_USED_DURING_BUILD ./bin/rails assets:precompile")
-  abort "root production Dockerfile must provide a non-secret renderer password during production asset precompilation"
-end
-unless root_dockerfile.include?("FROM docker.io/library/node:24-bookworm-slim AS node") &&
-       root_dockerfile.include?("corepack pnpm install --frozen-lockfile") &&
-       root_dockerfile.include?("exec corepack pnpm \"$@\"")
-  abort "root production Dockerfile must install Node and locked JavaScript dependencies before production asset precompilation"
-end
-
-kamal_deploy = YAML.load_file("config/deploy.yml", aliases: true)
-kamal_secrets = kamal_deploy.fetch("env").fetch("secret")
-unless kamal_secrets.include?("RENDERER_PASSWORD")
-  abort "Kamal production runtime must inject RENDERER_PASSWORD"
-end
-
-kamal_secret_sources = File.read(".kamal/secrets")
-unless kamal_secret_sources.match?(/^\s*RENDERER_PASSWORD=\$RENDERER_PASSWORD\s*(?:#.*)?$/)
-  abort "Kamal renderer password must be sourced from the deploy environment rather than checked into the repository"
-end
-
-summary = steps.find { |step| step["name"] == "Promotion summary" }
-abort "promotion summary step is missing" unless summary
-abort "promotion summary must gate success on workload readiness" unless summary.fetch("run").include?('WORKLOAD_READINESS_OUTCOME') && summary.fetch("run").include?('"${WORKLOAD_READINESS_OUTCOME}" == "success"')
-
-copy = steps.find { |step| step["id"] == "copy-image" }
-abort "copy image step is missing" unless copy
-abort "copy image must expose the promoted source commit" unless copy.fetch("run").include?('echo "source_commit=${staging_commit}" >> "$GITHUB_OUTPUT"')
-abort "promotion job must expose the promoted source commit" unless promotion_job.fetch("outputs").fetch("source_commit") == "${{ steps.copy-image.outputs.source_commit }}"
-
-release_job = promotion.fetch("jobs").fetch("create-github-release")
-release_step = release_job.fetch("steps").find { |step| step["name"] == "Create GitHub release" }
-abort "release step is missing" unless release_step
-abort "release must receive the promoted source commit" unless release_step.fetch("env").fetch("SOURCE_COMMIT") == "${{ needs.promote-to-production.outputs.source_commit }}"
-abort "release must resolve the promoted source commit" unless release_step.fetch("run").include?('repos/${GH_REPO}/commits/${SOURCE_COMMIT}')
-abort "release must target the promoted source commit" unless release_step.fetch("run").include?('--target "${release_target}"')
-RUBY
+custom_validator="bin/test-cpflow-github-flow-custom"
+if [[ -e "$custom_validator" || -L "$custom_validator" ]]; then
+  if [[ ! -f "$custom_validator" || ! -x "$custom_validator" ]]; then
+    echo "Custom validator must be an executable file: $custom_validator" >&2
+    exit 1
+  fi
+  echo "==> downstream cpflow GitHub flow checks"
+  "$ROOT/$custom_validator" "${cpflow_cmd[@]}"
+fi
