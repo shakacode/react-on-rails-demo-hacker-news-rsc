@@ -47,6 +47,9 @@ apps:
   react-on-rails-demo-hacker-news-rsc-review:
     <<: *common
     match_if_app_name_starts_with: true
+    generated_review_secret_keys:
+      - SECRET_KEY_BASE
+      - RENDERER_PASSWORD
     # To save review-app database cost, create one shared staging database
     # secret and policy, then uncomment this block and use
     # {{SHARED_SECRET_DATABASE}} in templates that need DATABASE_URL.
