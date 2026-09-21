@@ -32,7 +32,7 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 2.0"
+gem "image_processing", "~> 2.1"
 gem "ruby-vips", "~> 2.2"
 
 group :development, :test do
@@ -64,6 +64,6 @@ end
 gem "react_on_rails", "= 17.1.0"
 gem "react_on_rails_pro", "= 17.1.0"
 
-gem "shakapacker", "= 10.2.0"
+gem "shakapacker", "10.3.2"
 # Keep the webpack dev-server proxy compatible with Shakapacker 10.2.0.
-gem "rack-proxy", "= 0.8.3"
+gem "rack-proxy", "2.0.1"
