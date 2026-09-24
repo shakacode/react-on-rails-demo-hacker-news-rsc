@@ -15,4 +15,6 @@ means that capability is n/a here.
 | `docs` | Validate documentation | n/a |
 | `ci-detect` | Detect CI impact | n/a |
 
-Non-command policy lives in [`../agent-workflow.yml`](../agent-workflow.yml).
+Typed review and merge policy lives in [`../agent-workflow.yml`](../agent-workflow.yml).
+Repository-specific human rules live in [`../../AGENTS.md`](../../AGENTS.md).
+Shaka configuration commands are in [`../shaka.md`](../shaka.md).
