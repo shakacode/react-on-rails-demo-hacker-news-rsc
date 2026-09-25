@@ -15,7 +15,13 @@ report the blocker instead.
 ## Merge Gate
 
 Before merge, every current-head `gh pr checks` entry must be green, all review
-threads resolved, and GitHub must report the pull request mergeable clean.
+threads resolved, GitHub must report the pull request mergeable clean, and the
+review-app verification from Pull Request Readiness must still be passing (or
+have its non-blocking skip documented).
+
+The typed `review.required: none` means no configured CI review report is
+required. It does not waive this repository's check, review-thread, or
+review-app merge gate.
 
 At batch closeout, auto-merge ready low-risk pull requests that pass the merge
 gate above. Keep high-risk CI or workflow, build-configuration, dependency or
