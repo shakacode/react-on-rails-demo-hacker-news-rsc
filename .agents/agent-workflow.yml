@@ -2,6 +2,8 @@
 ---
 version: 1
 base_branch: main
+# Project-specific review, deployment, and risk limits are in AGENTS.md's Merge Gate.
+# Use the installed Shaka skill to read those rules from the trusted default-branch ref.
 review:
   required: none
 merge:

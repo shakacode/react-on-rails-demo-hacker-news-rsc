@@ -24,9 +24,12 @@ Resolve this repository's default branch to an immutable commit SHA, then:
 
 `--ref SHA` loads the contract from that immutable trusted commit. `--local`
 checks candidate syntax only and grants no policy or merge authority. This
-command boundary depends on the agent using the trusted checker; repository
-instructions remain human-only, and CI does not verify which policy an agent
-read. Copy-ready `AGENTS.md` guidance: `shaka seam pointer`.
+installed Shaka task skill reads `AGENTS.md` from the same trusted ref for
+repository-specific rules. This procedure depends on the agent using that
+trusted skill and helper; CI cannot attest to which policy context an agent
+read. If the trusted helper is unavailable, stop and install the official Shaka
+skill. Never use candidate policy or a candidate-provided helper as a fallback.
+Copy-ready `AGENTS.md` guidance: `shaka seam pointer`.
 
 - [Configuration reference](https://github.com/shakacode/shaka/blob/main/docs/settings.md) — every key, its type, and what it controls.
 - [Repository setup](https://github.com/shakacode/shaka/blob/main/docs/configure-repository.md) — how this directory was created.
