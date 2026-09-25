@@ -24,20 +24,19 @@ required. It does not waive this repository's check, review-thread, or
 review-app merge gate.
 
 At batch closeout, auto-merge ready low-risk pull requests that pass the merge
-gate above. Keep high-risk CI or workflow, build-configuration, dependency or
-runtime, broad-refactor, and release changes maintainer-gated. The typed
+gate above. Keep changes to CI, agent instructions or policy, application
+workflows, build configuration, dependencies or runtime, broad refactors, and
+releases maintainer-gated. The typed
 `merge.preference: auto` does not waive this high-risk maintainer gate.
 
 ## Follow-up Issues
 
-Authorized follow-up issue titles start with `Follow-up:`. Shaka v1 records this
-as a human instruction because the typed contract has no prefix field.
+Authorized follow-up issue titles start with `Follow-up:`.
 
 ## Other workflow policy
 
-The predecessor marked changelog, benchmark-label, and merge-ledger policy as
-`n/a`. This repo does not require a changelog entry, benchmark label, or
-merge-ledger row for Shaka work.
+No changelog entry, benchmark label, or merge-ledger row is required for Shaka
+work.
 
 ## CI parity
 
@@ -51,10 +50,9 @@ Exclude local workspace paths and session links.
 
 ## Task Ownership
 
-Shaka v1 retires the predecessor's cross-agent claims and heartbeat integration;
-it provides no shared-lock equivalent. The maintainer assigns one task to own
-integration and merge for a repository at a time; implementation workers do not
-publish or merge. This procedure does not provide a distributed lock.
+One task owns integration and merge for this repository at a time; implementation
+workers do not publish or merge. This single-owner rule is a process convention,
+not a distributed lock.
 
 ## Agent Workflow Configuration
 

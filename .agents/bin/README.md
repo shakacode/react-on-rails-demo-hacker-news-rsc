@@ -15,6 +15,6 @@ means that capability is n/a here.
 | `docs` | Validate documentation | n/a |
 | `ci-detect` | Detect CI impact | n/a |
 
-Typed review and merge policy lives in [`../agent-workflow.yml`](../agent-workflow.yml).
-Repository-specific human rules live in [`../../AGENTS.md`](../../AGENTS.md).
+Typed review and merge preferences live in [`../agent-workflow.yml`](../agent-workflow.yml).
+The trusted task skill also checks the repository-specific gates in [`../../AGENTS.md`](../../AGENTS.md).
 Shaka configuration commands are in [`../shaka.md`](../shaka.md).
