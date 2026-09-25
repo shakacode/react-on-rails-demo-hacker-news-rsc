@@ -22,8 +22,11 @@ Resolve this repository's default branch to an immutable commit SHA, then:
 
 `shaka seam check --root . --ref SHA`
 
-A candidate PR cannot grant itself authority by changing its own policy.
-Copy-ready `AGENTS.md` guidance: `shaka seam pointer`.
+`--ref SHA` loads the contract from that immutable trusted commit. `--local`
+checks candidate syntax only and grants no policy or merge authority. This
+command boundary depends on the agent using the trusted checker; repository
+instructions remain human-only, and CI does not verify which policy an agent
+read. Copy-ready `AGENTS.md` guidance: `shaka seam pointer`.
 
 - [Configuration reference](https://github.com/shakacode/shaka/blob/main/docs/settings.md) — every key, its type, and what it controls.
 - [Repository setup](https://github.com/shakacode/shaka/blob/main/docs/configure-repository.md) — how this directory was created.
