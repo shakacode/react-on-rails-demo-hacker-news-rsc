@@ -65,5 +65,5 @@ gem "react_on_rails", "= 17.1.0"
 gem "react_on_rails_pro", "= 17.1.0"
 
 gem "shakapacker", "= 10.2.0"
-# Keep the webpack dev-server proxy compatible with Shakapacker 10.2.0.
-gem "rack-proxy", "= 0.8.3"
+# Use the response-framing security fix while retaining the compatible 1.x API.
+gem "rack-proxy", "= 1.0.3"
