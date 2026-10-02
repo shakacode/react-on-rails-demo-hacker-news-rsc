@@ -52,15 +52,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
 
       - name: Checkout control-plane-flow actions
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           repository: shakacode/control-plane-flow
-          ref: f1c4a5f569ff388ba1625c704991062b90d2ab2f # v6.0.0.rc.0
+          ref: f1c4a5f569ff388ba1625c704991062b90d2ab2f
           path: .cpflow
           persist-credentials: false
 
@@ -170,7 +170,7 @@ jobs:
           cpln_cli_version: ${{ vars.CPLN_CLI_VERSION }}
           cpflow_version: ${{ vars.CPFLOW_VERSION }}
           # The setup action validates CPFLOW_VERSION against this full workflow ref.
-          control_plane_flow_ref: shakacode/control-plane-flow/.github/workflows/cpflow-promote-staging-to-production.yml@f1c4a5f569ff388ba1625c704991062b90d2ab2f # v6.0.0.rc.0
+          control_plane_flow_ref: shakacode/control-plane-flow/.github/workflows/cpflow-promote-staging-to-production.yml@f1c4a5f569ff388ba1625c704991062b90d2ab2f
 
       # Runs after Setup production environment so the pinned Ruby (>= 3.1) is on PATH.
       # YAML.load_file(..., aliases: true) is not supported on Ruby 3.0 (system Ruby on ubuntu-22.04).

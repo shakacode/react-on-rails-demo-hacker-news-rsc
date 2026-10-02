@@ -64,6 +64,6 @@ end
 gem "react_on_rails", "= 17.1.0"
 gem "react_on_rails_pro", "= 17.1.0"
 
-gem "shakapacker", "= 10.2.0"
-# Use the response-framing security fix while retaining the compatible 1.x API.
+gem "shakapacker", "= 10.3.2"
+# Use the response-framing security fix while retaining the 1.x API supported by Shakapacker 10.3.2.
 gem "rack-proxy", "= 1.0.3"

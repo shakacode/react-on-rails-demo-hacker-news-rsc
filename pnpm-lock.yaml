@@ -51,8 +51,8 @@ importers:
         specifier: ^17.0.0
         version: 17.0.0(@rspack/core@2.1.2)(webpack@5.108.4)
       shakapacker:
-        specifier: 10.2.0
-        version: 10.2.0(@rspack/cli@2.1.2(@rspack/core@2.1.2)(@rspack/dev-server@2.1.0(@rspack/core@2.1.2)(selfsigned@5.5.0)))(@rspack/core@2.1.2)(@rspack/dev-server@2.1.0(@rspack/core@2.1.2)(selfsigned@5.5.0))(@rspack/plugin-react-refresh@2.0.2(@rspack/core@2.1.2)(react-refresh@0.18.0))(@swc/core@1.15.43)(compression-webpack-plugin@12.0.0(webpack@5.108.4))(css-loader@7.1.4(@rspack/core@2.1.2)(webpack@5.108.4))(mini-css-extract-plugin@2.10.2(webpack@5.108.4))(rspack-manifest-plugin@5.2.2(@rspack/core@2.1.2))(sass-loader@17.0.0(@rspack/core@2.1.2)(webpack@5.108.4))(swc-loader@0.2.7(@swc/core@1.15.43)(webpack@5.108.4))(terser-webpack-plugin@5.6.1(@swc/core@1.15.43)(postcss@8.5.16)(webpack@5.108.4))(webpack-assets-manifest@6.5.2(webpack@5.108.4))(webpack-cli@7.2.1)(webpack-dev-server@5.2.6)(webpack-subresource-integrity@5.1.0(webpack@5.108.4))(webpack@5.108.4)
+        specifier: 10.3.2
+        version: 10.3.2(@rspack/cli@2.1.2(@rspack/core@2.1.2)(@rspack/dev-server@2.1.0(@rspack/core@2.1.2)(selfsigned@5.5.0)))(@rspack/core@2.1.2)(@rspack/dev-server@2.1.0(@rspack/core@2.1.2)(selfsigned@5.5.0))(@rspack/plugin-react-refresh@2.0.2(@rspack/core@2.1.2)(react-refresh@0.18.0))(@swc/core@1.15.43)(compression-webpack-plugin@12.0.0(webpack@5.108.4))(css-loader@7.1.4(@rspack/core@2.1.2)(webpack@5.108.4))(mini-css-extract-plugin@2.10.2(webpack@5.108.4))(rspack-manifest-plugin@5.2.2(@rspack/core@2.1.2))(sass-loader@17.0.0(@rspack/core@2.1.2)(webpack@5.108.4))(swc-loader@0.2.7(@swc/core@1.15.43)(webpack@5.108.4))(terser-webpack-plugin@5.6.1(@swc/core@1.15.43)(postcss@8.5.16)(webpack@5.108.4))(webpack-assets-manifest@6.5.2(webpack@5.108.4))(webpack-cli@7.2.1)(webpack-dev-server@5.2.6)(webpack-subresource-integrity@5.1.0(webpack@5.108.4))(webpack@5.108.4)
       style-loader:
         specifier: 4.0.0
         version: 4.0.0(webpack@5.108.4)
@@ -2324,8 +2324,8 @@ packages:
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
 
-  shakapacker@10.2.0:
-    resolution: {integrity: sha512-4jHAL3pCjI1BVf45hFPRVrsMRV54VIVVYrw1MmyX/Ks6rl2ydVt3rxpdzzxH4HFZ4umW6AsuAVSVucZE13taCw==}
+  shakapacker@10.3.2:
+    resolution: {integrity: sha512-W4LV0MFS1c6ayODF/Ra4RM5xS3DljBc9XGLqz04WGSap97U5gJ7FjBTChPmoJ/7VDiTYmL1w+vh+D360e9qK7Q==}
     engines: {node: ^20.19.0 || >=22.12.0, yarn: '>=1 <5'}
     hasBin: true
     peerDependencies:
@@ -2354,7 +2354,7 @@ packages:
       webpack: ^5.101.0
       webpack-assets-manifest: ^5.0.6 || ^6.0.0
       webpack-cli: ^4.9.2 || ^5.0.0 || ^6.0.0 || ^7.0.0
-      webpack-dev-server: ^5.2.2
+      webpack-dev-server: ^5.2.2 || ^6.0.0
       webpack-subresource-integrity: ^5.1.0
     peerDependenciesMeta:
       '@babel/core':
@@ -4994,7 +4994,7 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shakapacker@10.2.0(@rspack/cli@2.1.2(@rspack/core@2.1.2)(@rspack/dev-server@2.1.0(@rspack/core@2.1.2)(selfsigned@5.5.0)))(@rspack/core@2.1.2)(@rspack/dev-server@2.1.0(@rspack/core@2.1.2)(selfsigned@5.5.0))(@rspack/plugin-react-refresh@2.0.2(@rspack/core@2.1.2)(react-refresh@0.18.0))(@swc/core@1.15.43)(compression-webpack-plugin@12.0.0(webpack@5.108.4))(css-loader@7.1.4(@rspack/core@2.1.2)(webpack@5.108.4))(mini-css-extract-plugin@2.10.2(webpack@5.108.4))(rspack-manifest-plugin@5.2.2(@rspack/core@2.1.2))(sass-loader@17.0.0(@rspack/core@2.1.2)(webpack@5.108.4))(swc-loader@0.2.7(@swc/core@1.15.43)(webpack@5.108.4))(terser-webpack-plugin@5.6.1(@swc/core@1.15.43)(postcss@8.5.16)(webpack@5.108.4))(webpack-assets-manifest@6.5.2(webpack@5.108.4))(webpack-cli@7.2.1)(webpack-dev-server@5.2.6)(webpack-subresource-integrity@5.1.0(webpack@5.108.4))(webpack@5.108.4):
+  shakapacker@10.3.2(@rspack/cli@2.1.2(@rspack/core@2.1.2)(@rspack/dev-server@2.1.0(@rspack/core@2.1.2)(selfsigned@5.5.0)))(@rspack/core@2.1.2)(@rspack/dev-server@2.1.0(@rspack/core@2.1.2)(selfsigned@5.5.0))(@rspack/plugin-react-refresh@2.0.2(@rspack/core@2.1.2)(react-refresh@0.18.0))(@swc/core@1.15.43)(compression-webpack-plugin@12.0.0(webpack@5.108.4))(css-loader@7.1.4(@rspack/core@2.1.2)(webpack@5.108.4))(mini-css-extract-plugin@2.10.2(webpack@5.108.4))(rspack-manifest-plugin@5.2.2(@rspack/core@2.1.2))(sass-loader@17.0.0(@rspack/core@2.1.2)(webpack@5.108.4))(swc-loader@0.2.7(@swc/core@1.15.43)(webpack@5.108.4))(terser-webpack-plugin@5.6.1(@swc/core@1.15.43)(postcss@8.5.16)(webpack@5.108.4))(webpack-assets-manifest@6.5.2(webpack@5.108.4))(webpack-cli@7.2.1)(webpack-dev-server@5.2.6)(webpack-subresource-integrity@5.1.0(webpack@5.108.4))(webpack@5.108.4):
     dependencies:
       js-yaml: 4.1.1
       pack-config-diff: 0.1.0
