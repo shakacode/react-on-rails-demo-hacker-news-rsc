@@ -7,6 +7,10 @@ cd "$ROOT"
 echo "==> check promotion safety wiring"
 ruby <<'RUBY'
 require "yaml"
+review = YAML.load_file(".github/workflows/cpflow-deploy-review-app.yml", aliases: true)
+unless review.fetch("jobs").fetch("deploy").fetch("if").include?("github.actor != 'dependabot[bot]'")
+  abort "review-app deployment must skip Dependabot because its PR workflows lack secrets"
+end
 
 promotion_path = ".github/workflows/cpflow-promote-staging-to-production.yml"
 promotion = YAML.load_file(promotion_path, aliases: true)
