@@ -1,11 +1,11 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.1.2"
+gem "rails", "~> 8.1.4"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record
-gem "pg", "~> 1.1"
+gem "pg", "~> 1.7"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
@@ -32,7 +32,7 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 2.0"
+gem "image_processing", "~> 2.2"
 gem "ruby-vips", "~> 2.2"
 
 group :development, :test do
@@ -66,4 +66,4 @@ gem "react_on_rails_pro", "= 17.2.0.rc.2"
 
 gem "shakapacker", "= 10.3.2"
 # Use the response-framing security fix while retaining the 1.x API supported by Shakapacker 10.3.2.
-gem "rack-proxy", "= 1.0.3"
+gem "rack-proxy", "2.0.1"
