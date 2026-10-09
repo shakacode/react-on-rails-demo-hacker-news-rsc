@@ -5,6 +5,19 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+echo "==> check cpflow refs are immutable commits"
+ruby <<'RUBY'
+# bin/pin-cpflow-github-ref writes a release tag verbatim, so reject anything but a full SHA here.
+ref_pattern = %r{(?:uses:\s+shakacode/control-plane-flow/\.github/workflows/[^@\s]+@|control_plane_flow_ref:\s+\S+@)([^\s#]+)}
+checkout_ref_pattern = /repository:\s+shakacode\/control-plane-flow\s*\n\s+ref:\s+([^\s#]+)/
+mutable = Dir[".github/workflows/cpflow-*.yml"].sort.flat_map do |path|
+  text = File.read(path, encoding: "UTF-8")
+  (text.scan(ref_pattern) + text.scan(checkout_ref_pattern)).flatten.reject { |ref| ref.match?(/\A[0-9a-f]{40}\z/) }.map { |ref| "#{path}: #{ref}" }
+end
+abort "cpflow workflow refs must be full commit SHAs:\n#{mutable.join("\n")}" unless mutable.empty?
+puts "all cpflow workflow refs are full commit SHAs"
+RUBY
+
 echo "==> check promotion safety wiring"
 ruby <<'RUBY'
 require "yaml"
