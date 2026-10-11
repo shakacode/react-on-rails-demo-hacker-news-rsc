@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   deploy-staging:
-    uses: shakacode/control-plane-flow/.github/workflows/cpflow-deploy-staging.yml@3c914cfb7f8223b8f0e24957061e86c9d081db80
+    uses: shakacode/control-plane-flow/.github/workflows/cpflow-deploy-staging.yml@6aa575780f2d9175755881b79cbb3253adbc9c1f # v6.0.1
     with:
       staging_app_branch_default: ""
     secrets:
