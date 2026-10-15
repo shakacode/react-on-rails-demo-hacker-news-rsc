@@ -4,6 +4,7 @@ class HackerNewsAppTest < ApplicationSystemTestCase
   test "renders story lists for all feed types and paginates top stories" do
     visit "/"
     assert_text "React Server Components in practice"
+    assert_equal "flex", find("header").style("display").fetch("display")
 
     click_link "More →"
     assert_current_path "/news/2"

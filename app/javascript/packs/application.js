@@ -13,3 +13,7 @@
 //
 // const images = require.context('./images', true)
 // const imagePath = (name) => images(name, true)
+
+// Server-only RSC components still need their CSS in the browser.
+const componentStyles = require.context('../src/hn/components', false, /\.module\.css$/);
+componentStyles.keys().forEach(componentStyles);

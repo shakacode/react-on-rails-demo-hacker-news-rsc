@@ -1,5 +1,8 @@
 ENV["RAILS_ENV"] ||= "test"
-ENV["REACT_RENDERER_URL"] ||= "http://127.0.0.1:3800"
+require "socket"
+renderer_port_reservation = TCPServer.new("127.0.0.1", 0)
+ENV["RENDERER_PORT"] = renderer_port_reservation.addr[1].to_s
+ENV["REACT_RENDERER_URL"] = "http://127.0.0.1:#{ENV.fetch("RENDERER_PORT")}"
 ENV["RENDERER_PASSWORD"] ||= "devPassword"
 require_relative "../config/environment"
 require "rails/test_help"
@@ -12,7 +15,7 @@ ENV["HN_API_BASE_URL"] = FakeHackerNewsAPI.base_url
 FileUtils.rm_rf(Rails.root.join(".node-renderer-bundles"))
 ReactOnRails::PacksGenerator.instance.generate_packs_if_stale
 raise "Failed to compile test assets" unless system({ "RAILS_ENV" => "test" }, "bin/shakapacker")
-NodeRendererTestServer.start!
+NodeRendererTestServer.start!(port_reservation: renderer_port_reservation)
 
 Minitest.after_run do
   NodeRendererTestServer.stop!

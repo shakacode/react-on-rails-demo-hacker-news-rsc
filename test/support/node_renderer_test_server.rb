@@ -7,21 +7,21 @@ require "timeout"
 module NodeRendererTestServer
   extend self
 
-  PORT = 3800
-
-  def start!
+  def start!(port_reservation:)
     return if running?
 
-    @port = PORT
+    @port = Integer(ENV.fetch("RENDERER_PORT"))
     log_file = Rails.root.join("tmp/node-renderer-test.log")
     FileUtils.mkdir_p(log_file.dirname)
 
+    # Keep the port reserved through Rails boot and asset compilation.
+    port_reservation.close
     @pid = spawn(
       {
         "HN_API_BASE_URL" => ENV.fetch("HN_API_BASE_URL"),
         "NODE_ENV" => "test",
         "RENDERER_LOG_LEVEL" => "warn",
-        "RENDERER_PASSWORD" => "devPassword",
+        "RENDERER_PASSWORD" => ENV.fetch("RENDERER_PASSWORD"),
         "RENDERER_PORT" => @port.to_s
       },
       "node",
@@ -32,9 +32,6 @@ module NodeRendererTestServer
     )
 
     wait_until_ready
-
-    ReactOnRailsPro.configuration.renderer_password = "devPassword"
-    ReactOnRailsPro.configuration.renderer_url = "http://127.0.0.1:#{@port}"
   end
 
   def stop!
