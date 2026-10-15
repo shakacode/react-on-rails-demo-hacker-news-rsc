@@ -2,6 +2,7 @@ require "test_helper"
 
 class HttpCachingTest < ActionDispatch::IntegrationTest
   test "stories pages expose public caching and etags" do
+    freeze_time
     get "/"
 
     assert_response :success
@@ -13,6 +14,24 @@ class HttpCachingTest < ActionDispatch::IntegrationTest
     get "/", headers: { "If-None-Match" => response.headers["ETag"] }
 
     assert_response :not_modified
+  end
+
+  test "cache validators expire with each page freshness window" do
+    { "/" => 1.minute, "/item/1001" => 5.minutes, "/user/alice" => 10.minutes }.each do |path, ttl|
+      travel_to(Time.zone.local(2026, 10, 15, 0, 0, 0)) do
+        get path
+        assert_response :success
+        etag = response.headers.fetch("ETag")
+
+        get path, headers: { "If-None-Match" => etag }
+        assert_response :not_modified
+
+        travel ttl
+        get path, headers: { "If-None-Match" => etag }
+        assert_response :success
+        assert_not_equal etag, response.headers["ETag"]
+      end
+    end
   end
 
   test "item pages expose five minute caching" do

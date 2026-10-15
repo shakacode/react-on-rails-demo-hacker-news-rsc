@@ -7,9 +7,10 @@ class ApplicationController < ActionController::Base
   def apply_public_cache(ttl:, etag:)
     expires_in ttl, public: true
     append_vary_header("Accept")
+    window_start = cache_window_start(ttl)
     fresh_when(
-      etag: Array(etag),
-      last_modified: cache_window_start(ttl),
+      etag: [ *Array(etag), window_start ],
+      last_modified: window_start,
       public: true,
     )
   end
