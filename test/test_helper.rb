@@ -1,5 +1,7 @@
 ENV["RAILS_ENV"] ||= "test"
-ENV["REACT_RENDERER_URL"] ||= "http://127.0.0.1:3800"
+require "socket"
+ENV["RENDERER_PORT"] = TCPServer.open("127.0.0.1", 0) { |server| server.addr[1] }.to_s
+ENV["REACT_RENDERER_URL"] = "http://127.0.0.1:#{ENV.fetch("RENDERER_PORT")}"
 ENV["RENDERER_PASSWORD"] ||= "devPassword"
 require_relative "../config/environment"
 require "rails/test_help"
