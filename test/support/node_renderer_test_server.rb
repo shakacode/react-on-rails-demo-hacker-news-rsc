@@ -7,13 +7,15 @@ require "timeout"
 module NodeRendererTestServer
   extend self
 
-  def start!
+  def start!(port_reservation:)
     return if running?
 
     @port = Integer(ENV.fetch("RENDERER_PORT"))
     log_file = Rails.root.join("tmp/node-renderer-test.log")
     FileUtils.mkdir_p(log_file.dirname)
 
+    # Keep the port reserved through Rails boot and asset compilation.
+    port_reservation.close
     @pid = spawn(
       {
         "HN_API_BASE_URL" => ENV.fetch("HN_API_BASE_URL"),
