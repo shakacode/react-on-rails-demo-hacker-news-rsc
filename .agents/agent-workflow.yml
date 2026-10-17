@@ -6,6 +6,12 @@ base_branch: main
 # Use the installed Shaka skill to read those rules from the trusted default-branch ref.
 review:
   required: none
+  local_review_count: 2
+  local_review_agents:
+  - provider: anthropic
+    model_family: claude
+  - provider: openai
+    model_family: codex
 merge:
   preference: auto
 wip:
