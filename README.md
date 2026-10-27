@@ -38,7 +38,7 @@ Related:
 
 ### Prerequisites
 
-- Ruby `3.4.3`
+- Ruby `3.4.9`
 - Node.js `24.8.0`
 - `pnpm`
 - PostgreSQL
