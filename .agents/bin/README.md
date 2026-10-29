@@ -1,9 +1,9 @@
 # Agent Workflow Scripts
 
-Standard entry points that portable agent-workflow skills call, so a skill can
-run `.agents/bin/<name>` in any repo without knowing this repo's specific
-commands. Each script is a thin, repo-owned wrapper. A script that is **absent**
-means that capability is n/a here.
+Thin, repo-owned wrappers that agent skills call instead of this repo's
+specific commands. Shaka's standard `setup`, `validate`, and `test` live in
+[`../shaka/bin/`](../shaka/bin/); other tools, such as `lint`, stay here. A
+script that is **absent** means that capability is n/a here.
 
 | Script | Purpose | This repo runs |
 | --- | --- | --- |
@@ -15,6 +15,6 @@ means that capability is n/a here.
 | `docs` | Validate documentation | n/a |
 | `ci-detect` | Detect CI impact | n/a |
 
-Typed review and merge preferences live in [`../agent-workflow.yml`](../agent-workflow.yml).
+Typed review and merge preferences live in [`../shaka/config.yml`](../shaka/config.yml).
 The trusted task skill also checks the repository-specific gates in [`../../AGENTS.md`](../../AGENTS.md).
 Shaka configuration commands are in [`../shaka.md`](../shaka.md).
