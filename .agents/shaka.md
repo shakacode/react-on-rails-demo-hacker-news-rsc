@@ -6,8 +6,8 @@ The files below hold its configuration.
 
 | Path | Purpose |
 | --- | --- |
-| `agent-workflow.yml` | Typed review and merge preferences, read from the trusted default branch. Human risk limits remain in the root `AGENTS.md`; live GitHub settings still govern checks and approvals. |
-| `bin/` | Executable setup, test, and validation wrappers. Shaka runs the candidate checkout's copies; inspect changes before execution. |
+| `shaka/config.yml` | Typed review and merge preferences, read from the trusted default branch. Human risk limits remain in the root `AGENTS.md`; live GitHub settings still govern checks and approvals. |
+| `shaka/bin/` | Executable setup, test, and validation wrappers. Shaka runs the candidate checkout's copies; inspect changes before execution. |
 
 ## Check configuration edits
 
