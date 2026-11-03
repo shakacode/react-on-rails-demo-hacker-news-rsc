@@ -15,5 +15,5 @@ review:
 merge:
   preference: auto
 wip:
-  include_locations: false
+  include_checkout_path: false
 repo_prefix: RORHN
